@@ -8,21 +8,21 @@ import DefaultLayout from "@/components/Layouts/DefaultLaout";
 
 export const metadata: Metadata = {
   title: "Next.js Tables Page | pishro - Next.js Dashboard Kit",
-  description: "This is Next.js Tables page for pishro Dashboard Kit",
+  description: "This is Next.js Tables page for pishro Dashboard Kit"
 };
 
 const TablesPage = () => {
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Tables" />
+      <Breadcrumb pageName="جدول‌ها" />
 
       <div className="flex flex-col gap-10">
         <TableOne />
         <TableTwo />
         <TableThree />
       </div>
-    </DefaultLayout>
-  );
+    </DefaultLayout>);
+
 };
 
 export default TablesPage;

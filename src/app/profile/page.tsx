@@ -5,19 +5,19 @@ import ProfileBox from "@/components/ProfileBox";
 
 export const metadata: Metadata = {
   title: "Next.js Profile Page | pishro - Next.js Dashboard Kit",
-  description: "This is Next.js Profile page for pishro Dashboard Kit",
+  description: "This is Next.js Profile page for pishro Dashboard Kit"
 };
 
 const Profile = () => {
   return (
     <DefaultLayout>
       <div className="mx-auto w-full max-w-[970px]">
-        <Breadcrumb pageName="Profile" />
+        <Breadcrumb pageName="پروفایل" />
 
         <ProfileBox />
       </div>
-    </DefaultLayout>
-  );
+    </DefaultLayout>);
+
 };
 
 export default Profile;

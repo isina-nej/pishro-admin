@@ -43,6 +43,7 @@ const ChartTwo: React.FC = () => {
         },
       },
     ],
+
     plotOptions: {
       bar: {
         horizontal: false,
@@ -98,11 +99,11 @@ const ChartTwo: React.FC = () => {
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Profit this week
+            سود این هفته
           </h4>
         </div>
         <div>
-          <DefaultSelectOption options={["This Week", "Last Week"]} />
+          <DefaultSelectOption options={["این هفته", "هفته گذشته"]} />
         </div>
       </div>
 

@@ -6,32 +6,32 @@ const CalendarBox = () => {
           <thead>
             <tr className="grid grid-cols-7 rounded-t-[10px] bg-primary text-white">
               <th className="flex h-15 items-center justify-center rounded-tl-[10px] p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Sunday </span>
-                <span className="block lg:hidden"> Sun </span>
+                <span className="hidden lg:block"> یک‌شنبه </span>
+                <span className="block lg:hidden"> یک‌شنبه </span>
               </th>
               <th className="flex h-15 items-center justify-center p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Monday </span>
-                <span className="block lg:hidden"> Mon </span>
+                <span className="hidden lg:block"> دوشنبه </span>
+                <span className="block lg:hidden"> دوشنبه </span>
               </th>
               <th className="flex h-15 items-center justify-center p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Tuesday </span>
-                <span className="block lg:hidden"> Tue </span>
+                <span className="hidden lg:block"> سه‌شنبه </span>
+                <span className="block lg:hidden"> سه‌شنبه </span>
               </th>
               <th className="flex h-15 items-center justify-center p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Wednesday </span>
-                <span className="block lg:hidden"> Wed </span>
+                <span className="hidden lg:block"> چهارشنبه </span>
+                <span className="block lg:hidden"> چهارشنبه </span>
               </th>
               <th className="flex h-15 items-center justify-center p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Thursday </span>
-                <span className="block lg:hidden"> Thur </span>
+                <span className="hidden lg:block"> پنج‌شنبه </span>
+                <span className="block lg:hidden"> پنج‌شنبه </span>
               </th>
               <th className="flex h-15 items-center justify-center p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Friday </span>
-                <span className="block lg:hidden"> Fri </span>
+                <span className="hidden lg:block"> جمعه </span>
+                <span className="block lg:hidden"> جمعه </span>
               </th>
               <th className="flex h-15 items-center justify-center rounded-tr-[10px] p-1 text-body-xs font-medium sm:text-base xl:p-5">
-                <span className="hidden lg:block"> Saturday </span>
-                <span className="block lg:hidden"> Sat </span>
+                <span className="hidden lg:block"> شنبه </span>
+                <span className="block lg:hidden"> شنبه </span>
               </th>
             </tr>
           </thead>
@@ -42,11 +42,11 @@ const CalendarBox = () => {
                 <span className="font-medium text-dark dark:text-white">1</span>
                 <div className="group h-16 w-full flex-grow cursor-pointer py-1 md:h-30">
                   <span className="group-hover:text-primary md:hidden">
-                    More
+                    بیشتر
                   </span>
                   <div className="event invisible absolute left-2 z-99 mb-1 flex w-[200%] flex-col rounded-r-[5px] border-l-[3px] border-primary bg-gray-2 px-3 py-1 text-left opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-dark-2 md:visible md:w-[190%] md:opacity-100">
                     <span className="event-name font-medium text-dark dark:text-white">
-                      Redesign Website
+                      بازطراحی وب‌سایت
                     </span>
                     <span className="time text-sm">1 Dec - 2 Dec</span>
                   </div>
@@ -169,13 +169,13 @@ const CalendarBox = () => {
                 </span>
                 <div className="group h-16 w-full flex-grow cursor-pointer py-1 md:h-30">
                   <span className="group-hover:text-primary md:hidden">
-                    More
+                    بیشتر
                   </span>
                   <div className="event invisible absolute left-2 z-99 mb-1 flex w-[300%] flex-col rounded-r-[5px] border-l-[3px] border-primary bg-gray-2 px-3 py-1 text-left opacity-0 group-hover:visible group-hover:opacity-100 dark:bg-dark-2 md:visible md:w-[290%] md:opacity-100">
                     <span className="event-name font-medium text-dark dark:text-white">
-                      App Design
+                      طراحی اپلیکیشن
                     </span>
-                    <span className="time text-sm">25 Dec - 27 Dec</span>
+                    <span className="time text-sm">۲۵ تا ۲۷ دسامبر</span>
                   </div>
                 </div>
               </td>
@@ -230,8 +230,8 @@ const CalendarBox = () => {
           </tbody>
         </table>
       </div>
-    </>
-  );
+    </>);
+
 };
 
 export default CalendarBox;

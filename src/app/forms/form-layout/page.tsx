@@ -8,13 +8,13 @@ import InputGroup from "@/components/FormElements/InputGroup";
 
 export const metadata: Metadata = {
   title: "Next.js Form Layout Page | pishro - Next.js Dashboard Kit",
-  description: "This is Next.js Form Layout page for pishro Dashboard Kit",
+  description: "This is Next.js Form Layout page for pishro Dashboard Kit"
 };
 
 const FormLayout = () => {
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Form Layout" />
+      <Breadcrumb pageName="چیدمان فرم" />
 
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
         <div className="flex flex-col gap-9">
@@ -22,57 +22,57 @@ const FormLayout = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-semibold text-dark dark:text-white">
-                Contact Form
+                فرم تماس
               </h3>
             </div>
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-4.5 flex flex-col gap-4.5 xl:flex-row">
                   <InputGroup
-                    label="First name"
+                    label="نام"
                     type="text"
-                    placeholder="Enter your first name"
-                    customClasses="w-full xl:w-1/2"
-                  />
+                    placeholder="نام خود را وارد کنید"
+                    customClasses="w-full xl:w-1/2" />
+
 
                   <InputGroup
-                    label="Last name"
+                    label="نام خانوادگی"
                     type="text"
-                    placeholder="Enter your last name"
-                    customClasses="w-full xl:w-1/2"
-                  />
+                    placeholder="نام خانوادگی خود را وارد کنید"
+                    customClasses="w-full xl:w-1/2" />
+
                 </div>
 
                 <InputGroup
-                  label="Email"
+                  label="ایمیل"
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder="آدرس ایمیل خود را وارد کنید"
                   customClasses="mb-4.5"
-                  required
-                />
+                  required />
+
 
                 <InputGroup
-                  label="Subject"
+                  label="موضوع"
                   type="text"
-                  placeholder="Enter your subject"
-                  customClasses="mb-4.5"
-                />
+                  placeholder="موضوع خود را وارد کنید"
+                  customClasses="mb-4.5" />
+
 
                 <SelectGroupOne />
 
                 <div className="mb-6">
                   <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                    Message
+                    پیام
                   </label>
                   <textarea
                     rows={6}
-                    placeholder="Type your message"
-                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-                  ></textarea>
+                    placeholder="پیام خود را بنویسید"
+                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary">
+                  </textarea>
                 </div>
 
                 <button className="flex w-full justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90">
-                  Send Message
+                  ارسال پیام
                 </button>
               </div>
             </form>
@@ -84,23 +84,23 @@ const FormLayout = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-semibold text-dark dark:text-white">
-                Sign In Form
+                فرم ورود
               </h3>
             </div>
             <form action="#">
               <div className="p-6.5">
                 <InputGroup
-                  label="Email"
+                  label="ایمیل"
                   type="email"
-                  placeholder="Enter your email address"
-                  customClasses="mb-4.5"
-                />
+                  placeholder="آدرس ایمیل خود را وارد کنید"
+                  customClasses="mb-4.5" />
+
 
                 <InputGroup
-                  label="Password"
+                  label="رمز عبور"
                   type="password"
-                  placeholder="Enter your password"
-                />
+                  placeholder="رمز عبور خود را وارد کنید" />
+
 
                 <div className="mb-5.5 mt-5 flex items-center justify-between">
                   <label htmlFor="formCheckbox" className="flex cursor-pointer">
@@ -108,8 +108,8 @@ const FormLayout = () => {
                       <input
                         type="checkbox"
                         id="formCheckbox"
-                        className="taskCheckbox sr-only"
-                      />
+                        className="taskCheckbox sr-only" />
+
                       <div className="box mr-3 flex h-5 w-5 items-center justify-center rounded border border-stroke dark:border-dark-3">
                         <span className="text-white opacity-0">
                           <svg
@@ -118,31 +118,31 @@ const FormLayout = () => {
                             height="7"
                             viewBox="0 0 10 7"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
+                            xmlns="http://www.w3.org/2000/svg">
+
                             <path
                               fillRule="evenodd"
                               clipRule="evenodd"
                               d="M9.70685 0.292804C9.89455 0.480344 10 0.734667 10 0.999847C10 1.26503 9.89455 1.51935 9.70685 1.70689L4.70059 6.7072C4.51283 6.89468 4.2582 7 3.9927 7C3.72721 7 3.47258 6.89468 3.28482 6.7072L0.281063 3.70701C0.0986771 3.5184 -0.00224342 3.26578 3.785e-05 3.00357C0.00231912 2.74136 0.10762 2.49053 0.29326 2.30511C0.4789 2.11969 0.730026 2.01451 0.992551 2.01224C1.25508 2.00996 1.50799 2.11076 1.69683 2.29293L3.9927 4.58607L8.29108 0.292804C8.47884 0.105322 8.73347 0 8.99896 0C9.26446 0 9.51908 0.105322 9.70685 0.292804Z"
-                              fill=""
-                            />
+                              fill="" />
+
                           </svg>
                         </span>
                       </div>
                     </div>
-                    <p>Remember me</p>
+                    <p>مرا به خاطر بسپار</p>
                   </label>
 
                   <Link
                     href="#"
-                    className="text-body-sm text-primary hover:underline"
-                  >
-                    Forget password?
+                    className="text-body-sm text-primary hover:underline">
+
+                    رمز عبور را فراموش کرده‌اید؟
                   </Link>
                 </div>
 
                 <button className="flex w-full justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90">
-                  Sign In
+                  ورود
                 </button>
               </div>
             </form>
@@ -152,49 +152,49 @@ const FormLayout = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-semibold text-dark dark:text-white">
-                Sign Up Form
+                فرم ثبت‌نام
               </h3>
             </div>
             <form action="#">
               <div className="p-6.5">
                 <InputGroup
-                  label="Name"
+                  label="نام"
                   type="text"
-                  placeholder="Enter full name"
-                  customClasses="mb-4.5"
-                />
+                  placeholder="نام کامل را وارد کنید"
+                  customClasses="mb-4.5" />
+
 
                 <InputGroup
-                  label="Email"
+                  label="ایمیل"
                   type="email"
-                  placeholder="Enter email address"
-                  customClasses="mb-4.5"
-                />
+                  placeholder="آدرس ایمیل را وارد کنید"
+                  customClasses="mb-4.5" />
+
 
                 <InputGroup
-                  label="Password"
+                  label="رمز عبور"
                   type="password"
-                  placeholder="Enter password"
-                  customClasses="mb-4.5"
-                />
+                  placeholder="رمز عبور را وارد کنید"
+                  customClasses="mb-4.5" />
+
 
                 <InputGroup
-                  label="Re-type Password"
+                  label="تکرار رمز عبور"
                   type="password"
-                  placeholder="Re-enter"
-                  customClasses="mb-5.5"
-                />
+                  placeholder="تکرار رمز"
+                  customClasses="mb-5.5" />
+
 
                 <button className="flex w-full justify-center rounded-[7px] bg-primary p-[13px] font-medium text-white hover:bg-opacity-90">
-                  Sign Up
+                  ثبت‌نام
                 </button>
               </div>
             </form>
           </div>
         </div>
       </div>
-    </DefaultLayout>
-  );
+    </DefaultLayout>);
+
 };
 
 export default FormLayout;

@@ -5,7 +5,7 @@ import ReactApexChart from "react-apexcharts";
 const ChartFive: React.FC = () => {
   const series = [
     {
-      name: "Visitors",
+      name: "بازدیدکنندگان",
       data: [168, 385, 201, 298, 187, 195, 291],
     },
   ];
@@ -78,9 +78,9 @@ const ChartFive: React.FC = () => {
       <div className="flex justify-between border-b border-stroke px-6 pb-4.5 pt-5.5 dark:border-dark-3">
         <div>
           <h2 className="mb-1.5 text-body-2xlg font-bold text-dark dark:text-white">
-            Campaign Visitors
+            بازدیدکنندگان کمپین
           </h2>
-          <p className="text-body-sm font-medium">Last Campaign Performance</p>
+          <p className="text-body-sm font-medium">عملکرد آخرین کمپین</p>
         </div>
         <div>
           <h3 className="mb-0.5 text-body-2xlg font-bold text-dark dark:text-white">

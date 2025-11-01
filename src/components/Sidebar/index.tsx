@@ -15,7 +15,7 @@ interface SidebarProps {
 
 const menuGroups = [
   {
-    name: "MAIN MENU",
+    name: "منو اصلی",
     menuItems: [
       {
         icon: (
@@ -39,9 +39,9 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Dashboard",
+        label: "داشبورد",
         route: "#",
-        children: [{ label: "eCommerce", route: "/" }],
+        children: [{ label: "فروشگاه", route: "/" }],
       },
       {
         icon: (
@@ -85,7 +85,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Calendar",
+        label: "تقویم",
         route: "/calendar",
       },
       {
@@ -112,7 +112,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Profile",
+        label: "پروفایل",
         route: "/profile",
       },
       {
@@ -133,11 +133,11 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Forms",
+        label: "فرم‌ها",
         route: "#",
         children: [
-          { label: "Form Elements", route: "/forms/form-elements" },
-          { label: "Form Layout", route: "/forms/form-layout" },
+          { label: "عناصر فرم", route: "/forms/form-elements" },
+          { label: "چیدمان فرم", route: "/forms/form-layout" },
         ],
       },
       {
@@ -158,9 +158,9 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Tables",
+        label: "جداول",
         route: "#",
-        children: [{ label: "Tables", route: "/tables" }],
+        children: [{ label: "جداول", route: "/tables" }],
       },
       {
         icon: (
@@ -180,14 +180,14 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Pages",
+        label: "صفحات",
         route: "#",
-        children: [{ label: "Settings", route: "/pages/settings" }],
+        children: [{ label: "تنظیمات", route: "/pages/settings" }],
       },
     ],
   },
   {
-    name: "OTHERS",
+    name: "سایر موارد",
     menuItems: [
       {
         icon: (
@@ -211,9 +211,9 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Charts",
+        label: "نمودارها",
         route: "#",
-        children: [{ label: "Basic Chart", route: "/charts/basic-chart" }],
+        children: [{ label: "نمودار پایه", route: "/charts/basic-chart" }],
       },
       {
         icon: (
@@ -251,11 +251,11 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "UI Elements",
+        label: "عناصر رابط کاربری",
         route: "#",
         children: [
-          { label: "Alerts", route: "/ui-elements/alerts" },
-          { label: "Buttons", route: "/ui-elements/buttons" },
+          { label: "اعلان ها", route: "/ui-elements/alerts" },
+          { label: "دکمه ها", route: "/ui-elements/buttons" },
         ],
       },
       {
@@ -278,9 +278,9 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Authentication",
+        label: "احراز هویت",
         route: "#",
-        children: [{ label: "Sign In", route: "/auth/signin" }],
+        children: [{ label: "ورود", route: "/auth/signin" }],
       },
     ],
   },

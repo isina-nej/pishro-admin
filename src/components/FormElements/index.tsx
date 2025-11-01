@@ -17,7 +17,7 @@ import SelectGroupTwo from "@/components/FormElements/SelectGroup/SelectGroupTwo
 const FormElements = () => {
   return (
     <>
-      <Breadcrumb pageName="FormElements" />
+      <Breadcrumb pageName="عناصر فرم" />
 
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
         <div className="flex flex-col gap-9">
@@ -25,39 +25,39 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                Input Fields
+                فیلدهای ورودی
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Default Input
+                  ورودی پیش‌فرض
                 </label>
                 <input
                   type="text"
-                  placeholder="Default Input"
+                  placeholder="ورودی پیش‌فرض"
                   className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
                 />
               </div>
 
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Active Input
+                  ورودی فعال
                 </label>
                 <input
                   type="text"
-                  placeholder="Active Input"
+                  placeholder="ورودی فعال"
                   className="w-full rounded-[7px] border-[1.5px] border-primary bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:bg-dark-2 dark:text-white"
                 />
               </div>
 
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Disabled label
+                  برچسب غیرفعال
                 </label>
                 <input
                   type="text"
-                  placeholder="Disabled label"
+                  placeholder="برچسب غیرفعال"
                   disabled
                   className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary dark:disabled:bg-dark"
                 />
@@ -69,7 +69,7 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                Toggle switch input
+                سوییچ تغییر حالت
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
@@ -84,7 +84,7 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                Time and date
+                زمان و تاریخ
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
@@ -97,13 +97,13 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                File upload
+                آپلود فایل
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Attach file
+                  ضمیمه فایل
                 </label>
                 <input
                   type="file"
@@ -113,7 +113,7 @@ const FormElements = () => {
 
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Attach file
+                  ضمیمه فایل
                 </label>
                 <input
                   type="file"
@@ -129,40 +129,40 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                Textarea Fields
+                فیلدهای متنی
               </h3>
             </div>
             <div className="flex flex-col gap-6 p-6.5">
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Default textarea
+                  فیلد متنی پیش‌فرض
                 </label>
                 <textarea
                   rows={6}
-                  placeholder="Default textarea"
+                  placeholder="فیلد متنی پیش‌فرض"
                   className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
                 ></textarea>
               </div>
 
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Active textarea
+                  فیلد متنی فعال
                 </label>
                 <textarea
                   rows={6}
-                  placeholder="Active textarea"
+                  placeholder="فیلد متنی فعال"
                   className="w-full rounded-[7px] border-[1.5px] border-primary bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:bg-dark-2 dark:text-white"
                 ></textarea>
               </div>
 
               <div>
                 <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                  Disabled textarea
+                  فیلد متنی غیرفعال
                 </label>
                 <textarea
                   rows={6}
                   disabled
-                  placeholder="Disabled textarea"
+                  placeholder="فیلد متنی غیرفعال"
                   className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary dark:disabled:bg-dark"
                 ></textarea>
               </div>
@@ -173,7 +173,7 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                Checkbox and radio
+                چک‌باکس و دکمه رادیویی
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
@@ -189,7 +189,7 @@ const FormElements = () => {
           <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
             <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
               <h3 className="font-medium text-dark dark:text-white">
-                Select input
+                انتخاب ورودی
               </h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
