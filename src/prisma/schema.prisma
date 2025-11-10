@@ -1,0 +1,572 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone         String   @unique
+  passwordHash  String
+  phoneVerified Boolean  @default(false)
+  role          UserRole @default(USER)
+
+  // Personal Info
+  firstName    String?
+  lastName     String?
+  email        String?
+  nationalCode String?
+  birthDate    DateTime?
+  avatarUrl    String?
+
+  // Pay Info
+  cardNumber   String?
+  shebaNumber  String?
+  accountOwner String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  comments     Comment[]     @relation("UserComments")
+  orders       Order[]       @relation("UserOrders")
+  enrollments  Enrollment[]  @relation("UserEnrollments")
+  transactions Transaction[] @relation("UserTransactions")
+  newsComments NewsComment[] @relation("UserNewsComments")
+  quizAttempts QuizAttempt[] @relation("UserQuizAttempts")
+}
+
+model TempUser {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Otp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Course {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject         String
+  price           Int
+  img             String?
+  rating          Float?
+  description     String?
+  discountPercent Int?
+  time            String?
+  students        Int?
+  videosCount     Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime @default(now()) 
+  
+  category   Category? @relation("CategoryCourses", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?   @db.ObjectId
+
+  relatedTags Tag[]    @relation("CourseTags", fields: [tagIds], references: [id])
+  tagIds      String[] @db.ObjectId
+
+  slug          String?      @unique
+  level         CourseLevel?
+  language      Language     @default(FA)
+  prerequisites String[]     @default([])
+  learningGoals String[]     @default([])
+  instructor    String?
+  status        CourseStatus @default(ACTIVE)
+  published     Boolean      @default(true)
+  featured      Boolean      @default(false)
+  views         Int          @default(0)
+
+  comments    Comment[]    @relation("CourseComments")
+  enrollments Enrollment[] @relation("CourseEnrollments")
+  orderItems  OrderItem[]  @relation("CourseOrderItems")
+  quizzes     Quiz[]       @relation("CourseQuizzes")
+
+  @@index([categoryId])
+  @@index([published, featured])
+}
+
+model Comment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // User relation (optional for testimonials from non-users)
+  user   User?   @relation(fields: [userId], references: [id], name: "UserComments", onDelete: SetNull)
+  userId String? @db.ObjectId
+
+  // For testimonials without user account
+  userName    String?
+  userAvatar  String?
+  userRole    UserRoleType?
+  userCompany String?
+
+  // Content
+  text   String
+  rating Int?
+
+  // Relations
+  course     Course?   @relation(fields: [courseId], references: [id], name: "CourseComments", onDelete: Cascade)
+  courseId   String?   @db.ObjectId
+  category   Category? @relation("CategoryComments", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?   @db.ObjectId
+
+  // Engagement
+  likes    String[] @default([])
+  dislikes String[] @default([])
+
+  // Status & Visibility
+  published Boolean @default(false)
+  verified  Boolean @default(false)
+  featured  Boolean @default(false)
+
+  // Analytics
+  views Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId, published])
+  @@index([categoryId, published])
+  @@index([featured])
+}
+
+model Order {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  user         User?         @relation(fields: [userId], references: [id], name: "UserOrders")
+  userId       String?       @db.ObjectId
+  items        Json
+  total        Int
+  status       OrderStatus   @default(PENDING)
+  paymentRef   String?
+  createdAt    DateTime      @default(now())
+  orderItems   OrderItem[]   @relation("OrderOrderItems")
+  transactions Transaction[] @relation("OrderTransactions")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Enrollment {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  user         User      @relation(fields: [userId], references: [id], name: "UserEnrollments")
+  userId       String    @db.ObjectId
+  course       Course    @relation(fields: [courseId], references: [id], name: "CourseEnrollments")
+  courseId     String    @db.ObjectId
+  enrolledAt   DateTime  @default(now())
+  progress     Int       @default(0)
+  completedAt  DateTime?
+  lastAccessAt DateTime?
+
+  @@unique([userId, courseId])
+}
+
+model Transaction {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  user        User              @relation(fields: [userId], references: [id], name: "UserTransactions")
+  userId      String            @db.ObjectId
+  order       Order?            @relation(fields: [orderId], references: [id], name: "OrderTransactions")
+  orderId     String?           @db.ObjectId
+  amount      Int
+  type        TransactionType
+  status      TransactionStatus
+  gateway     String?
+  refNumber   String?
+  description String?
+  createdAt   DateTime          @default(now())
+}
+
+model OrderItem {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  order           Order  @relation(fields: [orderId], references: [id], name: "OrderOrderItems")
+  orderId         String @db.ObjectId
+  course          Course @relation(fields: [courseId], references: [id], name: "CourseOrderItems")
+  courseId        String @db.ObjectId
+  price           Int
+  discountPercent Int?
+}
+
+model NewsArticle {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String    @unique
+  excerpt     String
+  content     String
+  coverImage  String?
+  author      String?
+  category    String
+  tags        String[]
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  views       Int       @default(0)
+
+  relatedCategory Category? @relation("CategoryNews", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId      String?   @db.ObjectId
+
+  relatedTags Tag[]    @relation("NewsTags", fields: [tagIds], references: [id])
+  tagIds      String[] @db.ObjectId
+
+  featured    Boolean @default(false)
+  readingTime Int?
+  likes       Int     @default(0)
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  comments  NewsComment[] @relation("NewsArticleComments")
+
+  @@index([categoryId])
+  @@index([published, featured])
+  @@index([publishedAt])
+}
+
+model NewsComment {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  article   NewsArticle @relation(fields: [articleId], references: [id], name: "NewsArticleComments", onDelete: Cascade)
+  articleId String      @db.ObjectId
+  user      User?       @relation(fields: [userId], references: [id], name: "UserNewsComments", onDelete: SetNull)
+  userId    String?     @db.ObjectId
+  content   String
+  likes     String[]    @default([])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model DigitalBook {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique
+  author      String
+  description String
+  cover       String?
+  publisher   String?
+  year        Int
+  pages       Int?
+  isbn        String?
+  language    String   @default("فارسی")
+  rating      Float    @default(0)
+  votes       Int      @default(0)
+  views       Int      @default(0)
+  downloads   Int      @default(0)
+  category    String
+  formats     String[]
+  status      String[] @default([])
+  tags        String[] @default([])
+  readingTime String?
+  isFeatured  Boolean  @default(false)
+  price       Int?
+  fileUrl     String?
+  audioUrl    String?
+
+  relatedTags Tag[]    @relation("BookTags", fields: [tagIds], references: [id])
+  tagIds      String[] @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String  @unique
+  title       String
+  description String?
+  icon        String?
+  coverImage  String?
+  color       String?
+
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[] @default([])
+
+  // Hero/Landing section data
+  heroTitle       String?
+  heroSubtitle    String?
+  heroDescription String?
+  heroImage       String?
+  heroCta1Text    String?
+  heroCta1Link    String?
+  heroCta2Text    String?
+  heroCta2Link    String?
+
+  // About section data
+  aboutTitle1      String?
+  aboutTitle2      String?
+  aboutDescription String?
+  aboutImage       String?
+  aboutCta1Text    String?
+  aboutCta1Link    String?
+  aboutCta2Text    String?
+  aboutCta2Link    String?
+
+  // Stats/Metrics boxes (JSON array)
+  // Example: [{"text": "محتوای کاربردی", "number": "1K+", "icon": "/path/to/icon.svg"}]
+  statsBoxes Json? @default("[]")
+
+  // User level options (beginner, intermediate, advanced)
+  enableUserLevelSection Boolean @default(false)
+
+  published Boolean @default(true)
+  featured  Boolean @default(false)
+  order     Int     @default(0)
+
+  tags   Tag[]    @relation("CategoryTags", fields: [tagIds], references: [id])
+  tagIds String[] @db.ObjectId
+
+  courses  Course[]      @relation("CategoryCourses")
+  content  PageContent[] @relation("CategoryContent")
+  news     NewsArticle[] @relation("CategoryNews")
+  faqs     FAQ[]         @relation("CategoryFAQs")
+  comments Comment[]     @relation("CategoryComments")
+  quizzes  Quiz[]        @relation("CategoryQuizzes")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, featured])
+}
+
+model Tag {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  description String?
+  color       String?
+  icon        String?
+  published   Boolean? @default(false)
+
+  categories  Category[] @relation("CategoryTags", fields: [categoryIds], references: [id])
+  categoryIds String[]   @db.ObjectId
+
+  courses   Course[] @relation("CourseTags", fields: [courseIds], references: [id])
+  courseIds String[] @db.ObjectId
+
+  news    NewsArticle[] @relation("NewsTags", fields: [newsIds], references: [id])
+  newsIds String[]      @db.ObjectId
+
+  books   DigitalBook[] @relation("BookTags", fields: [bookIds], references: [id])
+  bookIds String[]      @db.ObjectId
+
+  usageCount Int @default(0)
+  clicks     Int @default(0)
+
+  seoTitle       String?
+  seoDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([usageCount])
+}
+
+model PageContent {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  category   Category @relation("CategoryContent", fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String   @db.ObjectId
+
+  type      PageContentType
+  section   String?
+  title     String?
+  subtitle  String?
+  content   Json
+  language  Language        @default(FA)
+  order     Int             @default(0)
+  published Boolean         @default(true)
+  publishAt DateTime?
+  expireAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId, type])
+  @@index([published, publishAt])
+}
+
+model FAQ {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  question    String
+  answer      String
+  category    Category?    @relation("CategoryFAQs", fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String?      @db.ObjectId
+  faqCategory FAQCategory?
+  order       Int          @default(0)
+  published   Boolean      @default(true)
+  featured    Boolean      @default(false)
+  views       Int          @default(0)
+  helpful     Int          @default(0)
+  notHelpful  Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([categoryId, published])
+  @@index([faqCategory])
+}
+
+model Quiz {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+
+  // Course relation (optional for level assessment quizzes)
+  course   Course? @relation("CourseQuizzes", fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String? @db.ObjectId
+
+  // Category relation (optional for category-level assessment quizzes)
+  category   Category? @relation("CategoryQuizzes", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?   @db.ObjectId
+
+  // Quiz settings
+  timeLimit          Int? // Time limit in minutes (null = no limit)
+  passingScore       Int     @default(70) // Percentage needed to pass
+  maxAttempts        Int? // Maximum attempts allowed (null = unlimited)
+  shuffleQuestions   Boolean @default(false)
+  shuffleAnswers     Boolean @default(false)
+  showResults        Boolean @default(true) // Show results after completion
+  showCorrectAnswers Boolean @default(true) // Show correct answers after completion
+
+  // Status
+  published Boolean @default(false)
+  order     Int     @default(0)
+
+  // Relations
+  questions QuizQuestion[] @relation("QuizQuestions")
+  attempts  QuizAttempt[]  @relation("QuizAttempts")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId, published])
+  @@index([categoryId, published])
+  @@index([published, order])
+}
+
+model QuizQuestion {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  quiz   Quiz   @relation("QuizQuestions", fields: [quizId], references: [id], onDelete: Cascade)
+  quizId String @db.ObjectId
+
+  question     String
+  questionType QuestionType @default(MULTIPLE_CHOICE)
+
+  // Options for multiple choice/checkbox questions (JSON array)
+  // Example: [{"text": "گزینه 1", "isCorrect": true}, {"text": "گزینه 2", "isCorrect": false}]
+  options Json @default("[]")
+
+  // For true/false questions
+  correctAnswer Boolean?
+
+  // Explanation shown after answering
+  explanation String?
+
+  // Points awarded for correct answer
+  points Int @default(1)
+
+  order Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([quizId, order])
+}
+
+model QuizAttempt {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  quiz   Quiz   @relation("QuizAttempts", fields: [quizId], references: [id], onDelete: Cascade)
+  quizId String @db.ObjectId
+
+  user   User   @relation("UserQuizAttempts", fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.ObjectId
+
+  // Attempt data
+  answers     Json // User's answers: [{"questionId": "...", "answer": "..." or ["...", "..."] for multiple}]
+  score       Float // Score percentage (0-100)
+  totalPoints Int // Total points earned
+  maxPoints   Int // Maximum possible points
+  passed      Boolean @default(false)
+  timeSpent   Int? // Time spent in seconds
+
+  // Status
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([quizId, userId])
+  @@index([userId, completedAt])
+}
+
+//
+// ===================== ENUMS =====================
+//
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CourseStatus {
+  ACTIVE
+  COMING_SOON
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum TransactionType {
+  PAYMENT
+  REFUND
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PageContentType {
+  LANDING
+  ABOUT
+  FEATURES
+  FAQ
+  TESTIMONIAL
+  HERO
+  STATS
+}
+
+enum Language {
+  FA
+  EN
+}
+
+enum FAQCategory {
+  GENERAL
+  PAYMENT
+  COURSES
+  TECHNICAL
+}
+
+enum UserRoleType {
+  STUDENT
+  PROFESSIONAL_TRADER
+  INVESTOR
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE // چند گزینه‌ای (یک جواب صحیح)
+  MULTIPLE_SELECT // چند گزینه‌ای (چند جواب صحیح)
+  TRUE_FALSE // صحیح/غلط
+  SHORT_ANSWER // پاسخ کوتاه
+}
