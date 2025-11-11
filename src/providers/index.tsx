@@ -3,6 +3,7 @@
 
 import { type ReactNode } from 'react';
 import ReactQueryProvider from './react-query-provider';
+import { AuthProvider } from '@/contexts/auth-context';
 
 /**
  * Combined Providers
@@ -15,6 +16,8 @@ interface ProvidersProps {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <ReactQueryProvider>{children}</ReactQueryProvider>
+    <ReactQueryProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ReactQueryProvider>
   );
 }
