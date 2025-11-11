@@ -79,13 +79,13 @@ apiClient.interceptors.response.use(
       if (status === 401) {
         console.error("Unauthorized - clearing token and redirecting to login");
         // Clear token from localStorage
-        if (typeof window !== "undefined") {
-          if (!window.location.pathname.includes("/login")) {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("authUser");
-            window.location.href = "/login";
-          }
-        }
+        // if (typeof window !== "undefined") {
+        //   if (!window.location.pathname.includes("/login")) {
+        //     localStorage.removeItem("authToken");
+        //     localStorage.removeItem("authUser");
+        //     window.location.href = "/login";
+        //   }
+        // }
       }
 
       // Handle forbidden errors

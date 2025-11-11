@@ -45,6 +45,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 **توضیحات:** احراز هویت کاربر با شماره تلفن و رمز عبور
 
 **Request Body:**
+
 ```json
 {
   "phone": "09123456789",
@@ -53,6 +54,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 **Response (Success):**
+
 ```json
 {
   "status": "success",
@@ -72,6 +74,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 **Response (Error):**
+
 ```json
 {
   "status": "fail",
@@ -83,6 +86,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 **Status Codes:**
+
 - `200`: ورود موفق
 - `401`: اطلاعات ورود نادرست
 - `422`: خطای اعتبارسنجی (validation error)
@@ -99,6 +103,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 **Request:** بدون نیاز به body
 
 **Response (Success):**
+
 ```json
 {
   "status": "success",
@@ -115,6 +120,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 **Response (Unauthorized):**
+
 ```json
 {
   "status": "fail",
@@ -126,6 +132,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 **Status Codes:**
+
 - `200`: کاربر احراز هویت شده
 - `401`: کاربر احراز هویت نشده
 
@@ -140,6 +147,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 **Request:** بدون نیاز به body
 
 **Response (Success):**
+
 ```json
 {
   "status": "success",
@@ -151,6 +159,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 **Status Codes:**
+
 - `200`: خروج موفق
 - `500`: خطای سرور
 
@@ -163,19 +172,19 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```typescript
 // Login
 async function login(phone: string, password: string) {
-  const response = await fetch('http://localhost:3000/api/auth/login', {
-    method: 'POST',
+  const response = await fetch("http://localhost:3000/api/auth/login", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    credentials: 'include', // مهم: برای ارسال cookies
+    credentials: "include", // مهم: برای ارسال cookies
     body: JSON.stringify({ phone, password }),
   });
 
   const data = await response.json();
 
-  if (data.status === 'success') {
-    console.log('User:', data.data);
+  if (data.status === "success") {
+    console.log("User:", data.data);
     return data.data;
   } else {
     throw new Error(data.message);
@@ -184,49 +193,49 @@ async function login(phone: string, password: string) {
 
 // Check Session
 async function checkSession() {
-  const response = await fetch('http://localhost:3000/api/auth/session', {
-    method: 'GET',
-    credentials: 'include', // مهم: برای ارسال cookies
+  const response = await fetch("http://localhost:3000/api/auth/session", {
+    method: "GET",
+    credentials: "include", // مهم: برای ارسال cookies
   });
 
   const data = await response.json();
-  return data.status === 'success' ? data.data.user : null;
+  return data.status === "success" ? data.data.user : null;
 }
 
 // Logout
 async function logout() {
-  const response = await fetch('http://localhost:3000/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include', // مهم: برای ارسال cookies
+  const response = await fetch("http://localhost:3000/api/auth/logout", {
+    method: "POST",
+    credentials: "include", // مهم: برای ارسال cookies
   });
 
   const data = await response.json();
-  return data.status === 'success';
+  return data.status === "success";
 }
 ```
 
 ### استفاده با Axios
 
 ```typescript
-import axios from 'axios';
+import axios from "axios";
 
 // تنظیم axios برای ارسال خودکار cookies
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: "http://localhost:3000",
   withCredentials: true, // مهم: برای ارسال cookies
 });
 
 // Login
 async function login(phone: string, password: string) {
   try {
-    const response = await api.post('/api/auth/login', {
+    const response = await api.post("/api/auth/login", {
       phone,
       password,
     });
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data.message || 'خطا در ورود');
+      throw new Error(error.response?.data.message || "خطا در ورود");
     }
     throw error;
   }
@@ -235,7 +244,7 @@ async function login(phone: string, password: string) {
 // Check Session
 async function checkSession() {
   try {
-    const response = await api.get('/api/auth/session');
+    const response = await api.get("/api/auth/session");
     return response.data.data.user;
   } catch (error) {
     return null;
@@ -245,7 +254,7 @@ async function checkSession() {
 // Logout
 async function logout() {
   try {
-    await api.post('/api/auth/logout');
+    await api.post("/api/auth/logout");
     return true;
   } catch (error) {
     return false;
@@ -256,11 +265,11 @@ async function logout() {
 ### استفاده در React Component
 
 ```typescript
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
   withCredentials: true,
 });
 
@@ -282,8 +291,8 @@ export function useAuth() {
 
   async function checkSession() {
     try {
-      const response = await api.get('/api/auth/session');
-      if (response.data.status === 'success') {
+      const response = await api.get("/api/auth/session");
+      if (response.data.status === "success") {
         setUser(response.data.data.user);
       }
     } catch (error) {
@@ -295,12 +304,12 @@ export function useAuth() {
 
   async function login(phone: string, password: string) {
     try {
-      const response = await api.post('/api/auth/login', {
+      const response = await api.post("/api/auth/login", {
         phone,
         password,
       });
 
-      if (response.data.status === 'success') {
+      if (response.data.status === "success") {
         setUser(response.data.data);
         return { success: true };
       }
@@ -308,16 +317,16 @@ export function useAuth() {
       if (axios.isAxiosError(error)) {
         return {
           success: false,
-          error: error.response?.data.message || 'خطا در ورود',
+          error: error.response?.data.message || "خطا در ورود",
         };
       }
-      return { success: false, error: 'خطای ناشناخته' };
+      return { success: false, error: "خطای ناشناخته" };
     }
   }
 
   async function logout() {
     try {
-      await api.post('/api/auth/logout');
+      await api.post("/api/auth/logout");
       setUser(null);
       return true;
     } catch (error) {
@@ -332,7 +341,7 @@ export function useAuth() {
     logout,
     checkSession,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'ADMIN',
+    isAdmin: user?.role === "ADMIN",
   };
 }
 ```
@@ -353,9 +362,12 @@ export function useAuth() {
 ```typescript
 // بررسی session هر 5 دقیقه
 useEffect(() => {
-  const interval = setInterval(() => {
-    checkSession();
-  }, 5 * 60 * 1000); // 5 minutes
+  const interval = setInterval(
+    () => {
+      checkSession();
+    },
+    5 * 60 * 1000,
+  ); // 5 minutes
 
   return () => clearInterval(interval);
 }, []);
@@ -368,6 +380,7 @@ useEffect(() => {
 ### انواع خطاها:
 
 #### 1. Validation Error (422)
+
 ```json
 {
   "status": "fail",
@@ -379,6 +392,7 @@ useEffect(() => {
 ```
 
 #### 2. Authentication Error (401)
+
 ```json
 {
   "status": "fail",
@@ -390,6 +404,7 @@ useEffect(() => {
 ```
 
 #### 3. Server Error (500)
+
 ```json
 {
   "status": "error",
@@ -403,12 +418,12 @@ useEffect(() => {
 ```typescript
 async function handleLogin(phone: string, password: string) {
   try {
-    const response = await api.post('/api/auth/login', {
+    const response = await api.post("/api/auth/login", {
       phone,
       password,
     });
 
-    if (response.data.status === 'success') {
+    if (response.data.status === "success") {
       // Success
       return { success: true, user: response.data.data };
     }
@@ -416,7 +431,7 @@ async function handleLogin(phone: string, password: string) {
     if (axios.isAxiosError(error)) {
       const data = error.response?.data;
 
-      if (data?.status === 'fail') {
+      if (data?.status === "fail") {
         // Client error (validation, auth, etc.)
         return {
           success: false,
@@ -425,7 +440,7 @@ async function handleLogin(phone: string, password: string) {
         };
       }
 
-      if (data?.status === 'error') {
+      if (data?.status === "error") {
         // Server error
         return {
           success: false,
@@ -437,7 +452,7 @@ async function handleLogin(phone: string, password: string) {
 
     return {
       success: false,
-      error: 'خطای ناشناخته رخ داد',
+      error: "خطای ناشناخته رخ داد",
     };
   }
 }
@@ -448,45 +463,45 @@ async function handleLogin(phone: string, password: string) {
 ## الزامات امنیتی
 
 ### 1. HTTPS در Production
+
 در محیط production حتماً از HTTPS استفاده کنید:
+
 ```env
 NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 ```
 
 ### 2. تنظیم CORS
+
 آدرس CMS خود را در متغیرهای محیطی تنظیم کنید:
+
 ```env
 NEXT_PUBLIC_CMS_URL=https://admin.yourdomain.com
 ```
 
 ### 3. محافظت از Admin Routes
+
 پس از login، همیشه `role` کاربر را بررسی کنید:
+
 ```typescript
-if (user?.role !== 'ADMIN') {
+if (user?.role !== "ADMIN") {
   // Redirect to unauthorized page
-  router.push('/unauthorized');
+  router.push("/unauthorized");
 }
 ```
 
 ### 4. Timeout مدیریت Session
+
 اگر session منقضی شد، کاربر را به صفحه login هدایت کنید:
+
 ```typescript
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       // Session expired, redirect to login
-      window.location.href = '/login';
+      window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 ```
-
----
-
-## پشتیبانی
-
-اگر سوالی دارید یا مشکلی پیش آمد، با تیم توسعه تماس بگیرید.
-
-**مخزن پروژه:** [amir-9/pishro](https://github.com/amir-9/pishro)
