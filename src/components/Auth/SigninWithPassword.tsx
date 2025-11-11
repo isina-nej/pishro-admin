@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
@@ -28,27 +27,13 @@ export default function SigninWithPassword() {
     setLoading(true);
 
     try {
-      // Call backend login API
-      // TODO: Update this endpoint when you receive the actual auth routes
-      const response = await api.post<any>('/auth/login', {
-        phone: data.phone,
-        password: data.password,
-      });
+      // Call the login function from auth context
+      // This will handle the API call and set the user state
+      await login(data.phone, data.password);
 
-      // Extract token and user data from response
-      // Adjust these paths based on your actual API response structure
-      const { token, user } = response.data;
-
-      if (token && user) {
-        // Save token and user data
-        login(token, user);
-
-        // Redirect to dashboard
-        router.push("/");
-        router.refresh();
-      } else {
-        setError("پاسخ نامعتبر از سرور");
-      }
+      // Redirect to dashboard after successful login
+      router.push("/");
+      router.refresh();
     } catch (err: any) {
       console.error("Login error:", err);
       setError(err.message || "شماره تلفن یا رمز عبور اشتباه است");

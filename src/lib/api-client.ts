@@ -7,10 +7,9 @@ import type { ApiResponse } from './api-response';
  * Centralized configuration for all API requests to external backend
  */
 
-// Base URL configuration - uses local Next.js API proxy routes
-// Empty string means requests will go to the same origin (local Next.js server)
-// which will then proxy them to the backend, avoiding CORS issues
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+// Base URL configuration - connects directly to backend API
+// CORS has been fixed on the backend, so we can make direct requests
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pishro-0.vercel.app/api';
 
 // Create Axios instance
 const apiClient: AxiosInstance = axios.create({

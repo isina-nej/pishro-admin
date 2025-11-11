@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from "./api-client";
 
 // تعریف نوع User بر اساس مستندات API
 export interface User {
