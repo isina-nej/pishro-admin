@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useNews } from "@/hooks/api/use-news";
 
 import type { NewsArticleWithRelations } from "@/types/api";
+import Image from "next/image";
 
 const NewsTable: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -94,7 +95,7 @@ const NewsTable: React.FC = () => {
                         <div className="flex items-center gap-3">
                           {news.coverImage && (
                             <div className="h-12 w-12 overflow-hidden rounded">
-                              <img
+                              <Image
                                 src={news.coverImage}
                                 alt={news.title}
                                 className="h-full w-full object-cover"

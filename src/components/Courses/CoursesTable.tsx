@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useCourses, useDeleteCourse } from "@/hooks/api/use-courses";
 import type { CourseWithRelations } from "@/types/api";
+import Image from "next/image";
 
 const CoursesTable: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -116,7 +117,7 @@ const CoursesTable: React.FC = () => {
                         <div className="flex items-center gap-3">
                           {course.img && (
                             <div className="h-12 w-12 overflow-hidden rounded">
-                              <img
+                              <Image
                                 src={course.img}
                                 alt={course.subject}
                                 className="h-full w-full object-cover"

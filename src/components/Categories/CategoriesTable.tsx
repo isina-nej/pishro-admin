@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useCategories } from "@/hooks/api/use-categories";
 
 import type { CategoryWithRelations } from "@/types/api";
+import Image from "next/image";
 
 const CategoriesTable: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -90,7 +91,7 @@ const CategoriesTable: React.FC = () => {
                         <div className="flex items-center gap-3">
                           {category.icon && (
                             <div className="h-10 w-10 overflow-hidden rounded">
-                              <img
+                              <Image
                                 src={category.icon}
                                 alt={category.title}
                                 className="h-full w-full object-cover"
