@@ -74,19 +74,19 @@ const CommentsTable: React.FC = () => {
               </thead>
 
               <tbody>
-                {data?.data?.items?.map(
+                {data?.items?.map(
                   (comment: CommentWithRelations, index: number) => (
                     <tr key={comment.id}>
                       <td
-                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.data.items.length - 1 ? "border-b-0" : "border-b"}`}
+                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <p className="line-clamp-2 text-dark dark:text-white">
-                          {comment.content}
+                          {comment.text}
                         </p>
                       </td>
 
                       <td
-                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.data.items.length - 1 ? "border-b-0" : "border-b"}`}
+                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <p className="text-dark dark:text-white">
                           {comment.userName || comment.user?.firstName}
@@ -94,15 +94,15 @@ const CommentsTable: React.FC = () => {
                       </td>
 
                       <td
-                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.data.items.length - 1 ? "border-b-0" : "border-b"}`}
+                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <p className="text-dark dark:text-white">
-                          {comment.course?.title || "-"}
+                          {comment.course?.subject || "-"}
                         </p>
                       </td>
 
                       <td
-                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.data.items.length - 1 ? "border-b-0" : "border-b"}`}
+                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <p className="text-dark dark:text-white">
                           {comment.rating ? `${comment.rating}/5` : "-"}
@@ -110,7 +110,7 @@ const CommentsTable: React.FC = () => {
                       </td>
 
                       <td
-                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.data.items.length - 1 ? "border-b-0" : "border-b"}`}
+                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <span
                           className={`inline-flex rounded-full px-3 py-1 text-body-sm font-medium ${comment.published ? "bg-[#219653]/[0.08] text-[#219653]" : "bg-[#FFA70B]/[0.08] text-[#FFA70B]"}`}
@@ -120,7 +120,7 @@ const CommentsTable: React.FC = () => {
                       </td>
 
                       <td
-                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.data.items.length - 1 ? "border-b-0" : "border-b"}`}
+                        className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <div className="flex items-center gap-3">
                           <Link
@@ -165,10 +165,10 @@ const CommentsTable: React.FC = () => {
               </tbody>
             </table>
 
-            {data?.data && (
+            {data && (
               <div className="mt-4 flex items-center justify-between">
                 <p className="text-body text-body-sm">
-                  نمایش {data.data.items.length} از {data.data.total} نظر
+                  نمایش {data.items.length} از {data.pagination.total} نظر
                 </p>
 
                 <div className="flex gap-2">
@@ -181,12 +181,12 @@ const CommentsTable: React.FC = () => {
                   </button>
 
                   <span className="px-3 py-1">
-                    صفحه {page} از {data.data.totalPages}
+                    صفحه {page} از {data.pagination.totalPages}
                   </span>
 
                   <button
                     onClick={() => setPage((p) => p + 1)}
-                    disabled={!data.data.hasNextPage}
+                    disabled={!data.pagination.hasNextPage}
                     className="rounded bg-gray px-3 py-1 text-body-sm disabled:opacity-50"
                   >
                     بعدی

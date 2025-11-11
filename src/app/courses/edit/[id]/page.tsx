@@ -11,7 +11,7 @@ const EditCoursePage = () => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="H�1'�4 /H1G" />
+      <Breadcrumb pageName="ویرایش دوره" />
       <CourseForm courseId={id} isEdit={true} />
     </DefaultLayout>
   );

@@ -103,22 +103,22 @@ const CoursesTable: React.FC = () => {
               </thead>
 
               <tbody>
-                {data?.data?.items?.map(
+                {data?.items?.map(
                   (course: CourseWithRelations, index: number) => (
                     <tr key={course.id}>
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          {course.imageUrl && (
+                          {course.img && (
                             <div className="h-12 w-12 overflow-hidden rounded">
                               <img
-                                src={course.imageUrl}
-                                alt={course.title}
+                                src={course.img}
+                                alt={course.subject}
                                 className="h-full w-full object-cover"
                               />
                             </div>
@@ -126,7 +126,7 @@ const CoursesTable: React.FC = () => {
 
                           <div>
                             <h5 className="font-medium text-dark dark:text-white">
-                              {course.title}
+                              {course.subject}
                             </h5>
 
                             <p className="text-body text-body-sm">
@@ -138,7 +138,7 @@ const CoursesTable: React.FC = () => {
 
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
@@ -150,7 +150,7 @@ const CoursesTable: React.FC = () => {
 
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
@@ -162,7 +162,7 @@ const CoursesTable: React.FC = () => {
 
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
@@ -174,7 +174,7 @@ const CoursesTable: React.FC = () => {
 
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
@@ -192,7 +192,7 @@ const CoursesTable: React.FC = () => {
 
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
@@ -210,7 +210,7 @@ const CoursesTable: React.FC = () => {
 
                       <td
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${
-                          index === data.data.items.length - 1
+                          index === data.items.length - 1
                             ? "border-b-0"
                             : "border-b"
                         }`}
@@ -272,7 +272,7 @@ const CoursesTable: React.FC = () => {
 
                           <button
                             onClick={() =>
-                              handleDelete(course.id, course.title)
+                              handleDelete(course.id, course.subject)
                             }
                             className="hover:text-danger"
                             title="حذف"
@@ -309,10 +309,10 @@ const CoursesTable: React.FC = () => {
 
             {/* Pagination */}
 
-            {data?.data && (
+            {data && (
               <div className="mt-4 flex items-center justify-between">
                 <p className="text-body text-body-sm">
-                  نمایش {data.data.items.length} از {data.data.total} دوره
+                  نمایش {data.items.length} از {data.pagination.total} دوره
                 </p>
 
                 <div className="flex gap-2">
@@ -325,12 +325,12 @@ const CoursesTable: React.FC = () => {
                   </button>
 
                   <span className="px-3 py-1">
-                    صفحه {page} از {data.data.totalPages}
+                    صفحه {page} از {data.pagination.totalPages}
                   </span>
 
                   <button
                     onClick={() => setPage((p) => p + 1)}
-                    disabled={!data.data.hasNextPage}
+                    disabled={!data.pagination.hasNextPage}
                     className="rounded bg-gray px-3 py-1 text-body-sm disabled:opacity-50"
                   >
                     بعدی

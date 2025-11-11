@@ -35,27 +35,35 @@ const CourseForm: React.FC<CourseFormProps> = ({
   const { data: categoriesData } = useCategories({ limit: 100 });
 
   const [formData, setFormData] = useState<CreateCourseRequest>({
-    title: "",
+    subject: "",
 
     slug: "",
 
     description: "",
 
-    shortDescription: "",
-
     price: 0,
 
-    discountPrice: 0,
+    discountPercent: 0,
 
-    imageUrl: "",
+    img: "",
 
-    videoUrl: "",
+    rating: null,
+
+    time: "",
+
+    students: null,
+
+    videosCount: null,
 
     level: "BEGINNER",
 
     language: "FA",
 
-    duration: 0,
+    prerequisites: [],
+
+    learningGoals: [],
+
+    instructor: null,
 
     status: "ACTIVE",
 
@@ -63,43 +71,55 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
     featured: false,
 
+    views: 0,
+
     categoryId: undefined,
 
     tagIds: [],
   });
 
   useEffect(() => {
-    if (isEdit && courseData?.data) {
-      const course = courseData.data;
+    if (isEdit && courseData) {
+      const course = courseData;
 
       setFormData({
-        title: course.title,
+        subject: course.subject,
 
-        slug: course.slug,
+        slug: course.slug || "",
 
         description: course.description || "",
 
-        shortDescription: course.shortDescription || "",
-
         price: course.price,
 
-        discountPrice: course.discountPrice || 0,
+        discountPercent: course.discountPercent || 0,
 
-        imageUrl: course.imageUrl || "",
+        img: course.img || "",
 
-        videoUrl: course.videoUrl || "",
+        rating: course.rating || null,
 
-        level: course.level,
+        time: course.time || "",
+
+        students: course.students || null,
+
+        videosCount: course.videosCount || null,
+
+        level: course.level || "BEGINNER",
 
         language: course.language,
 
-        duration: course.duration || 0,
+        prerequisites: course.prerequisites || [],
+
+        learningGoals: course.learningGoals || [],
+
+        instructor: course.instructor || null,
 
         status: course.status,
 
         published: course.published,
 
         featured: course.featured,
+
+        views: course.views || 0,
 
         categoryId: course.categoryId || undefined,
 
@@ -166,8 +186,8 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
             <input
               type="text"
-              name="title"
-              value={formData.title}
+              name="subject"
+              value={formData.subject}
               onChange={handleChange}
               required
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -182,9 +202,8 @@ const CourseForm: React.FC<CourseFormProps> = ({
             <input
               type="text"
               name="slug"
-              value={formData.slug}
+              value={formData.slug || ""}
               onChange={handleChange}
-              required
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
           </div>
@@ -192,26 +211,12 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
         <div className="mb-5.5">
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            توضیحات کوتاه
-          </label>
-
-          <textarea
-            name="shortDescription"
-            value={formData.shortDescription}
-            onChange={handleChange}
-            rows={3}
-            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-          />
-        </div>
-
-        <div className="mb-5.5">
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            توضیحات کامل
+            توضیحات
           </label>
 
           <textarea
             name="description"
-            value={formData.description}
+            value={formData.description || ""}
             onChange={handleChange}
             rows={6}
             className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -236,13 +241,13 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              قیمت با تخفیف (تومان)
+              درصد تخفیف
             </label>
 
             <input
               type="number"
-              name="discountPrice"
-              value={formData.discountPrice}
+              name="discountPercent"
+              value={formData.discountPercent || ""}
               onChange={handleChange}
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
@@ -263,7 +268,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
             >
               <option value="">انتخاب کنید...</option>
 
-              {categoriesData?.data?.items?.map((cat: any) => (
+              {categoriesData?.items?.map((cat: any) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.title}
                 </option>
@@ -278,7 +283,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
             <select
               name="level"
-              value={formData.level}
+              value={formData.level || "BEGINNER"}
               onChange={handleChange}
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             >
@@ -294,13 +299,13 @@ const CourseForm: React.FC<CourseFormProps> = ({
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              مدت زمان (دقیقه)
+              مدت زمان
             </label>
 
             <input
-              type="number"
-              name="duration"
-              value={formData.duration}
+              type="text"
+              name="time"
+              value={formData.time || ""}
               onChange={handleChange}
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
@@ -331,22 +336,8 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
           <input
             type="text"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
-            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-          />
-        </div>
-
-        <div className="mb-5.5">
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            URL ویدیو
-          </label>
-
-          <input
-            type="text"
-            name="videoUrl"
-            value={formData.videoUrl}
+            name="img"
+            value={formData.img || ""}
             onChange={handleChange}
             className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
           />
