@@ -76,7 +76,7 @@ export function useUpdateNews() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateNewsRequest }) => {
       const response = await api.patch<NewsResponse>(`/admin/news/${id}`, data);
-      return response.data;
+      return response.data as unknown as NewsResponse;
     },
     onSuccess: (response: NewsResponse) => {
       queryClient.invalidateQueries({ queryKey: newsKeys.lists() });

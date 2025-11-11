@@ -76,7 +76,7 @@ export function useUpdateUser() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateUserRequest }) => {
       const response = await api.patch<UserResponse>(`/admin/users/${id}`, data);
-      return response.data;
+      return response.data as unknown as UserResponse;
     },
     onSuccess: (response: UserResponse) => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });

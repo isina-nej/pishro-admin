@@ -76,7 +76,7 @@ export function useUpdateComment() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateCommentRequest }) => {
       const response = await api.patch<CommentResponse>(`/admin/comments/${id}`, data);
-      return response.data;
+      return response.data as unknown as CommentResponse;
     },
     onSuccess: (response: CommentResponse) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.lists() });
