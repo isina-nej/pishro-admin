@@ -78,9 +78,11 @@ export function useUpdateNews() {
       const response = await api.patch<NewsResponse>(`/admin/news/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: NewsResponse) => {
       queryClient.invalidateQueries({ queryKey: newsKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: newsKeys.detail((data as NewsArticleWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: newsKeys.detail(response.data.id as string) });
+      }
     },
   });
 }

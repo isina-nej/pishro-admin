@@ -78,9 +78,11 @@ export function useUpdateEnrollment() {
       const response = await api.patch<EnrollmentResponse>(`/admin/enrollments/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: EnrollmentResponse) => {
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: enrollmentKeys.detail((data as EnrollmentWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: enrollmentKeys.detail(response.data.id as string) });
+      }
     },
   });
 }

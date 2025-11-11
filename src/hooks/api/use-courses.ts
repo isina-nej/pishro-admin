@@ -78,9 +78,11 @@ export function useUpdateCourse() {
       const response = await api.patch<CourseResponse>(`/admin/courses/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: CourseResponse) => {
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail((data as CourseWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: courseKeys.detail(response.data.id as string) });
+      }
     },
   });
 }

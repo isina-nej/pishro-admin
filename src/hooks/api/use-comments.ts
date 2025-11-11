@@ -78,9 +78,11 @@ export function useUpdateComment() {
       const response = await api.patch<CommentResponse>(`/admin/comments/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: CommentResponse) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: commentKeys.detail((data as CommentWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: commentKeys.detail(response.data.id as string) });
+      }
     },
   });
 }

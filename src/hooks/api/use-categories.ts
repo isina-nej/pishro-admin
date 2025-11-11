@@ -78,9 +78,11 @@ export function useUpdateCategory() {
       const response = await api.patch<CategoryResponse>(`/admin/categories/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: CategoryResponse) => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: categoryKeys.detail((data as CategoryWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: categoryKeys.detail(response.data.id as string) });
+      }
     },
   });
 }

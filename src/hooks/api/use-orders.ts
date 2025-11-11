@@ -60,9 +60,11 @@ export function useUpdateOrder() {
       const response = await api.patch<OrderResponse>(`/admin/orders/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: OrderResponse) => {
       queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: orderKeys.detail((data as OrderWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: orderKeys.detail(response.data.id as string) });
+      }
     },
   });
 }

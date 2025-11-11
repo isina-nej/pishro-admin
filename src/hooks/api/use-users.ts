@@ -78,9 +78,11 @@ export function useUpdateUser() {
       const response = await api.patch<UserResponse>(`/admin/users/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (response: UserResponse) => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: userKeys.detail((data as UserWithRelations).id) });
+      if (response.data && 'id' in response.data) {
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(response.data.id as string) });
+      }
     },
   });
 }
