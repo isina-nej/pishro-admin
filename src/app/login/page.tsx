@@ -28,7 +28,7 @@ export default function LoginPage() {
     try {
       await login(phone, password);
       // بعد از login موفق، به dashboard redirect می‌شود
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: any) {
       setError(err.message || "خطا در ورود");
     } finally {
