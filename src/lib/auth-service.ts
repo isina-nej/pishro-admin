@@ -1,4 +1,4 @@
-import { api } from './api';
+import { api } from "./api";
 
 // تعریف نوع User بر اساس مستندات API
 export interface User {
@@ -15,7 +15,7 @@ export interface User {
 
 // تعریف نوع پاسخ API
 interface ApiResponse<T> {
-  status: 'success' | 'fail' | 'error';
+  status: "success" | "fail" | "error";
   message: string;
   data: T;
 }
@@ -41,31 +41,32 @@ interface SessionResponse {
 // تابع login
 export async function login(phone: string, password: string): Promise<User> {
   try {
-    const response = await api.post<ApiResponse<LoginResponse>>('/api/auth/login', {
+    const response = await api.post<ApiResponse<LoginResponse>>("/auth/login", {
       phone,
       password,
     });
 
-    if (response.data.status === 'success') {
+    if (response.data.status === "success") {
       return response.data.data;
     }
 
-    throw new Error(response.data.message || 'خطا در ورود');
+    throw new Error(response.data.message || "خطا در ورود");
   } catch (error: any) {
     // مدیریت خطاهای axios
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
     }
-    throw new Error('خطا در برقراری ارتباط با سرور');
+    throw new Error("خطا در برقراری ارتباط با سرور");
   }
 }
 
 // تابع بررسی session
 export async function checkSession(): Promise<User | null> {
   try {
-    const response = await api.get<ApiResponse<SessionResponse>>('/api/auth/session');
+    const response =
+      await api.get<ApiResponse<SessionResponse>>("/auth/session");
 
-    if (response.data.status === 'success') {
+    if (response.data.status === "success") {
       return response.data.data.user;
     }
 
@@ -79,10 +80,11 @@ export async function checkSession(): Promise<User | null> {
 // تابع logout
 export async function logout(): Promise<boolean> {
   try {
-    const response = await api.post<ApiResponse<{ loggedOut: boolean }>>('/api/auth/logout');
-    return response.data.status === 'success';
+    const response =
+      await api.post<ApiResponse<{ loggedOut: boolean }>>("/auth/logout");
+    return response.data.status === "success";
   } catch (error) {
-    console.error('خطا در خروج:', error);
+    console.error("خطا در خروج:", error);
     return false;
   }
 }
