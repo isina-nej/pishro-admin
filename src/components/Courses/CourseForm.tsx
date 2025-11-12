@@ -169,6 +169,22 @@ const CourseForm: React.FC<CourseFormProps> = ({
     }));
   };
 
+  const handleArrayAdd = (field: 'prerequisites' | 'learningGoals', value: string) => {
+    if (value.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: [...prev[field], value.trim()],
+      }));
+    }
+  };
+
+  const handleArrayRemove = (field: 'prerequisites' | 'learningGoals', index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
+  };
+
   return (
     <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark">
       <div className="border-b border-stroke px-7 py-4 dark:border-dark-3">
@@ -324,9 +340,72 @@ const CourseForm: React.FC<CourseFormProps> = ({
             >
               <option value="ACTIVE">فعال</option>
 
-              <option value="INACTIVE">غیرفعال</option>
+              <option value="COMING_SOON">به زودی</option>
+
+              <option value="ARCHIVED">آرشیو شده</option>
             </select>
           </div>
+        </div>
+
+        <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+          <div className="w-full sm:w-1/3">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              تعداد دانشجویان
+            </label>
+
+            <input
+              type="number"
+              name="students"
+              value={formData.students || ""}
+              onChange={handleChange}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
+
+          <div className="w-full sm:w-1/3">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              تعداد ویدیوها
+            </label>
+
+            <input
+              type="number"
+              name="videosCount"
+              value={formData.videosCount || ""}
+              onChange={handleChange}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
+
+          <div className="w-full sm:w-1/3">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              زبان
+            </label>
+
+            <select
+              name="language"
+              value={formData.language}
+              onChange={handleChange}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            >
+              <option value="FA">فارسی</option>
+
+              <option value="EN">انگلیسی</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="mb-5.5">
+          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+            مدرس
+          </label>
+
+          <input
+            type="text"
+            name="instructor"
+            value={formData.instructor || ""}
+            onChange={handleChange}
+            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+          />
         </div>
 
         <div className="mb-5.5">
@@ -341,6 +420,114 @@ const CourseForm: React.FC<CourseFormProps> = ({
             onChange={handleChange}
             className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
           />
+        </div>
+
+        <div className="mb-5.5">
+          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+            پیش‌نیازها
+          </label>
+
+          <div className="mb-3 space-y-2">
+            {formData.prerequisites.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={item}
+                  disabled
+                  className="w-full rounded-[7px] border-[1.5px] border-stroke bg-gray-2 px-5.5 py-3 text-dark dark:border-dark-3 dark:bg-dark-3 dark:text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleArrayRemove('prerequisites', index)}
+                  className="rounded bg-red px-4 py-3 text-white hover:bg-opacity-90"
+                >
+                  حذف
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              id="prerequisite-input"
+              placeholder="یک پیش‌نیاز وارد کنید"
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const input = e.target as HTMLInputElement;
+                  handleArrayAdd('prerequisites', input.value);
+                  input.value = '';
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.getElementById('prerequisite-input') as HTMLInputElement;
+                handleArrayAdd('prerequisites', input.value);
+                input.value = '';
+              }}
+              className="rounded bg-primary px-6 py-3 text-white hover:bg-opacity-90"
+            >
+              افزودن
+            </button>
+          </div>
+        </div>
+
+        <div className="mb-5.5">
+          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+            اهداف یادگیری
+          </label>
+
+          <div className="mb-3 space-y-2">
+            {formData.learningGoals.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={item}
+                  disabled
+                  className="w-full rounded-[7px] border-[1.5px] border-stroke bg-gray-2 px-5.5 py-3 text-dark dark:border-dark-3 dark:bg-dark-3 dark:text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleArrayRemove('learningGoals', index)}
+                  className="rounded bg-red px-4 py-3 text-white hover:bg-opacity-90"
+                >
+                  حذف
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              id="learningGoal-input"
+              placeholder="یک هدف یادگیری وارد کنید"
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const input = e.target as HTMLInputElement;
+                  handleArrayAdd('learningGoals', input.value);
+                  input.value = '';
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.getElementById('learningGoal-input') as HTMLInputElement;
+                handleArrayAdd('learningGoals', input.value);
+                input.value = '';
+              }}
+              className="rounded bg-primary px-6 py-3 text-white hover:bg-opacity-90"
+            >
+              افزودن
+            </button>
+          </div>
         </div>
 
         <div className="mb-5.5 flex gap-5">
