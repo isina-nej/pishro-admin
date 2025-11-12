@@ -1,9 +1,14 @@
+"use client";
 import React from "react";
 import { dataStats } from "@/types/dataStats";
+import { useDashboardStats } from "@/hooks/api/use-dashboard";
 
-const dataStatsList = [
-  {
-    icon: (
+const DataStatsOne: React.FC<dataStats> = () => {
+  const { data: stats, isLoading, error } = useDashboardStats();
+
+  // Define icons for each stat
+  const icons = {
+    views: (
       <svg
         width="26"
         height="26"
@@ -23,13 +28,7 @@ const dataStatsList = [
         />
       </svg>
     ),
-    color: "#3FD97F",
-    title: "کل بازدیدها",
-    value: "3.456K",
-    growthRate: 0.43,
-  },
-  {
-    icon: (
+    revenue: (
       <svg
         width="26"
         height="26"
@@ -45,13 +44,7 @@ const dataStatsList = [
         />
       </svg>
     ),
-    color: "#FF9C55",
-    title: "درآمد کل",
-    value: "$42.2K",
-    growthRate: 4.35,
-  },
-  {
-    icon: (
+    orders: (
       <svg
         width="26"
         height="26"
@@ -73,13 +66,7 @@ const dataStatsList = [
         />
       </svg>
     ),
-    color: "#8155FF",
-    title: "کل سفارشات",
-    value: "2.450",
-    growthRate: 2.59,
-  },
-  {
-    icon: (
+    users: (
       <svg
         width="26"
         height="26"
@@ -111,14 +98,81 @@ const dataStatsList = [
         />
       </svg>
     ),
-    color: "#18BFFF",
-    title: "کل کاربران",
-    value: "3.465",
-    growthRate: -0.95,
-  },
-];
+  };
 
-const DataStatsOne: React.FC<dataStats> = () => {
+  // Format number for display
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  // Format currency for display
+  const formatCurrency = (num: number): string => {
+    return num.toLocaleString('fa-IR') + ' تومان';
+  };
+
+  const dataStatsList = stats
+    ? [
+        {
+          icon: icons.views,
+          color: "#3FD97F",
+          title: "کل بازدیدها",
+          value: formatNumber(stats.totalViews.value),
+          growthRate: stats.totalViews.growthRate * 100,
+        },
+        {
+          icon: icons.revenue,
+          color: "#FF9C55",
+          title: "درآمد کل",
+          value: formatCurrency(stats.totalRevenue.value),
+          growthRate: stats.totalRevenue.growthRate * 100,
+        },
+        {
+          icon: icons.orders,
+          color: "#8155FF",
+          title: "کل سفارشات",
+          value: formatNumber(stats.totalOrders.value),
+          growthRate: stats.totalOrders.growthRate * 100,
+        },
+        {
+          icon: icons.users,
+          color: "#18BFFF",
+          title: "کل کاربران",
+          value: formatNumber(stats.totalUsers.value),
+          growthRate: stats.totalUsers.growthRate * 100,
+        },
+      ]
+    : [];
+
+  if (error) {
+    return (
+      <div className="rounded-[10px] bg-red-50 p-6 text-center">
+        <p className="text-red-600">خطا در بارگذاری آمار داشبورد</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark animate-pulse">
+            <div className="h-14.5 w-14.5 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            <div className="mt-6 space-y-3">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">

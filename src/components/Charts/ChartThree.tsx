@@ -1,12 +1,17 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React from "react";
+import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
+import { useDashboardDevices } from "@/hooks/api/use-dashboard";
 
 const ChartThree: React.FC = () => {
-  const series = [65, 34, 12, 56];
+  const [period, setPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const { data: devicesData, isLoading, error } = useDashboardDevices({ period });
+
+  const series = devicesData
+    ? [devicesData.desktop, devicesData.tablet, devicesData.mobile, devicesData.unknown]
+    : [0, 0, 0, 0];
 
   const options: ApexOptions = {
     chart: {
@@ -66,6 +71,25 @@ const ChartThree: React.FC = () => {
     ],
   };
 
+  if (error) {
+    return (
+      <div className="col-span-12 rounded-[10px] bg-red-50 p-6 text-center xl:col-span-5">
+        <p className="text-red-600">خطا در بارگذاری داده‌های دستگاه‌ها</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="col-span-12 rounded-[10px] bg-white px-7.5 pb-7 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-5">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-40" />
+          <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="col-span-12 rounded-[10px] bg-white px-7.5 pb-7 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-5">
       <div className="mb-9 justify-between gap-4 sm:flex">
@@ -75,7 +99,14 @@ const ChartThree: React.FC = () => {
           </h4>
         </div>
         <div>
-          <DefaultSelectOption options={["ماهانه", "سالانه"]} />
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value as 'monthly' | 'yearly')}
+            className="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 font-medium outline-none"
+          >
+            <option value="monthly">ماهانه</option>
+            <option value="yearly">سالانه</option>
+          </select>
         </div>
       </div>
 
@@ -92,7 +123,7 @@ const ChartThree: React.FC = () => {
               <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-blue"></span>
               <p className="flex w-full justify-between text-body-sm font-medium text-dark dark:text-dark-6">
                 <span> دسکتاپ </span>
-                <span> 65% </span>
+                <span> {devicesData?.desktop}% </span>
               </p>
             </div>
           </div>
@@ -101,7 +132,7 @@ const ChartThree: React.FC = () => {
               <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-blue-light"></span>
               <p className="flex w-full justify-between text-body-sm font-medium text-dark dark:text-dark-6">
                 <span> تبلت </span>
-                <span> 34% </span>
+                <span> {devicesData?.tablet}% </span>
               </p>
             </div>
           </div>
@@ -110,7 +141,7 @@ const ChartThree: React.FC = () => {
               <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-blue-light-2"></span>
               <p className="flex w-full justify-between text-body-sm font-medium text-dark dark:text-dark-6">
                 <span> موبایل </span>
-                <span> 45% </span>
+                <span> {devicesData?.mobile}% </span>
               </p>
             </div>
           </div>
@@ -119,7 +150,7 @@ const ChartThree: React.FC = () => {
               <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-blue-light-3"></span>
               <p className="flex w-full justify-between text-body-sm font-medium text-dark dark:text-dark-6">
                 <span> نامشخص </span>
-                <span> 12% </span>
+                <span> {devicesData?.unknown}% </span>
               </p>
             </div>
           </div>

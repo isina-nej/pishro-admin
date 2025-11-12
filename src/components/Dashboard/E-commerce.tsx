@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import dynamic from 'next/dynamic';
-import TableOne from "../Tables/TableOne";
 import DataStatsOne from "@/components/DataStats/DataStatsOne";
 
 const ChartOne = dynamic(() => import("@/components/Charts/ChartOne"), { ssr: false });
@@ -17,11 +16,6 @@ const ECommerce: React.FC = () => {
         <ChartOne />
         <ChartTwo />
         <ChartThree />
-        {/* <MapOne /> */}
-        <div className="col-span-12 xl:col-span-8">
-          <TableOne />
-        </div>
-        {/* <ChatCard /> */}
       </div>
     </>
   );

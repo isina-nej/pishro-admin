@@ -380,3 +380,60 @@ export interface QuizAttemptsQueryParams extends PaginationParams {
   userId?: string;
   passed?: boolean;
 }
+
+/**
+ * Dashboard Types
+ */
+
+export interface DashboardStatItem {
+  value: number;
+  growthRate: number; // decimal format: 0.43 = 43%
+}
+
+export interface DashboardStats {
+  totalViews: DashboardStatItem;
+  totalRevenue: DashboardStatItem;
+  totalOrders: DashboardStatItem;
+  totalUsers: DashboardStatItem;
+}
+
+export interface PaymentsData {
+  months: string[];
+  receivedAmount: number[];
+  dueAmount: number[];
+  totalReceived: number;
+  totalDue: number;
+}
+
+export interface ProfitData {
+  days: string[];
+  sales: number[];
+  revenue: number[];
+}
+
+export interface DevicesData {
+  desktop: number;
+  tablet: number;
+  mobile: number;
+  unknown: number;
+  totalVisitors: number;
+}
+
+// Dashboard API Responses
+export type DashboardStatsResponse = ApiSuccessResponse<DashboardStats>;
+export type PaymentsDataResponse = ApiSuccessResponse<PaymentsData>;
+export type ProfitDataResponse = ApiSuccessResponse<ProfitData>;
+export type DevicesDataResponse = ApiSuccessResponse<DevicesData>;
+
+// Dashboard Query Parameters
+export interface PaymentsQueryParams {
+  period?: 'monthly' | 'yearly';
+}
+
+export interface ProfitQueryParams {
+  period?: 'this_week' | 'last_week';
+}
+
+export interface DevicesQueryParams {
+  period?: 'monthly' | 'yearly';
+}

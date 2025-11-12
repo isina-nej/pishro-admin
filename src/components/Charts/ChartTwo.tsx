@@ -1,21 +1,29 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React from "react";
+import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
+import { useDashboardProfit } from "@/hooks/api/use-dashboard";
 
 const ChartTwo: React.FC = () => {
-  const series = [
-    {
-      name: "Sales",
-      data: [44, 55, 41, 67, 22, 43, 65],
-    },
-    {
-      name: "Revenue",
-      data: [13, 23, 20, 8, 13, 27, 15],
-    },
-  ];
+  const [period, setPeriod] = useState<'this_week' | 'last_week'>('this_week');
+  const { data: profitData, isLoading, error } = useDashboardProfit({ period });
+
+  const series = profitData
+    ? [
+        {
+          name: "فروش",
+          data: profitData.sales,
+        },
+        {
+          name: "درآمد",
+          data: profitData.revenue,
+        },
+      ]
+    : [
+        { name: "فروش", data: [] },
+        { name: "درآمد", data: [] },
+      ];
 
   const options: ApexOptions = {
     colors: ["#5750F1", "#0ABEF9"],
@@ -74,7 +82,7 @@ const ChartTwo: React.FC = () => {
     },
 
     xaxis: {
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
+      categories: profitData?.days || [],
     },
     legend: {
       position: "top",
@@ -96,16 +104,42 @@ const ChartTwo: React.FC = () => {
     },
   };
 
+  if (error) {
+    return (
+      <div className="col-span-12 rounded-[10px] bg-red-50 p-6 text-center xl:col-span-5">
+        <p className="text-red-600">خطا در بارگذاری داده‌های سود</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="col-span-12 rounded-[10px] bg-white px-7.5 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-5">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+          <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="col-span-12 rounded-[10px] bg-white px-7.5 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-5">
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            سود این هفته
+            سود هفتگی
           </h4>
         </div>
         <div>
-          <DefaultSelectOption options={["این هفته", "هفته گذشته"]} />
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value as 'this_week' | 'last_week')}
+            className="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 font-medium outline-none"
+          >
+            <option value="this_week">این هفته</option>
+            <option value="last_week">هفته گذشته</option>
+          </select>
         </div>
       </div>
 

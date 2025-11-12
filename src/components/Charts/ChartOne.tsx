@@ -1,21 +1,30 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React from "react";
+import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
+import { useDashboardPayments } from "@/hooks/api/use-dashboard";
 
 const ChartOne: React.FC = () => {
-  const series = [
-    {
-      name: "Received Amount",
-      data: [0, 20, 35, 45, 35, 55, 65, 50, 65, 75, 60, 75],
-    },
-    {
-      name: "Due Amount",
-      data: [15, 9, 17, 32, 25, 68, 80, 68, 84, 94, 74, 62],
-    },
-  ];
+  const [period, setPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const { data: paymentsData, isLoading, error } = useDashboardPayments({ period });
+
+  const series = paymentsData
+    ? [
+        {
+          name: "مبلغ دریافتی",
+          data: paymentsData.receivedAmount,
+        },
+        {
+          name: "مبلغ معوق",
+          data: paymentsData.dueAmount,
+        },
+      ]
+    : [
+        { name: "مبلغ دریافتی", data: [] },
+        { name: "مبلغ معوق", data: [] },
+      ];
 
   const options: ApexOptions = {
     legend: {
@@ -100,21 +109,7 @@ const ChartOne: React.FC = () => {
     },
     xaxis: {
       type: "category",
-      categories: [
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-      ],
-
+      categories: paymentsData?.months || [],
       axisBorder: {
         show: false,
       },
@@ -131,6 +126,25 @@ const ChartOne: React.FC = () => {
     },
   };
 
+  if (error) {
+    return (
+      <div className="col-span-12 rounded-[10px] bg-red-50 p-6 text-center xl:col-span-7">
+        <p className="text-red-600">خطا در بارگذاری داده‌های پرداخت</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="col-span-12 rounded-[10px] bg-white px-7.5 pb-6 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-7">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="col-span-12 rounded-[10px] bg-white px-7.5 pb-6 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-7">
       <div className="mb-3.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
@@ -143,7 +157,14 @@ const ChartOne: React.FC = () => {
           <p className="font-medium uppercase text-dark dark:text-dark-6">
             مرتب‌سازی بر اساس:
           </p>
-          <DefaultSelectOption options={["ماهانه", "سالانه"]} />
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value as 'monthly' | 'yearly')}
+            className="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 font-medium outline-none"
+          >
+            <option value="monthly">ماهانه</option>
+            <option value="yearly">سالانه</option>
+          </select>
         </div>
       </div>
       <div>
@@ -161,13 +182,13 @@ const ChartOne: React.FC = () => {
         <div className="border-stroke dark:border-dark-3 xsm:w-1/2 xsm:border-r">
           <p className="font-medium">مبلغ دریافتی</p>
           <h4 className="mt-1 text-xl font-bold text-dark dark:text-white">
-            $45,070.00
+            {paymentsData?.totalReceived.toLocaleString('fa-IR')} تومان
           </h4>
         </div>
         <div className="xsm:w-1/2">
-          <p className="font-medium">مبلغ قابل پرداخت</p>
+          <p className="font-medium">مبلغ معوق</p>
           <h4 className="mt-1 text-xl font-bold text-dark dark:text-white">
-            $32,400.00
+            {paymentsData?.totalDue.toLocaleString('fa-IR')} تومان
           </h4>
         </div>
       </div>
