@@ -171,26 +171,25 @@ const BooksTable: React.FC = () => {
             {data && data.pagination && (
               <div className="mt-4 flex items-center justify-between">
                 <p className="text-sm text-dark dark:text-white">
-                  نمایش {data.pagination.from} تا {data.pagination.to} از{" "}
-                  {data.pagination.total} کتاب
+                  نمایش {data.items.length} از {data.pagination.total} کتاب
                 </p>
 
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
+                    disabled={!data.pagination.hasPrevPage}
                     className="rounded border border-stroke px-3 py-1.5 text-sm font-medium text-dark hover:bg-gray disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:text-white"
                   >
                     قبلی
                   </button>
 
                   <span className="flex items-center px-3 text-sm text-dark dark:text-white">
-                    صفحه {data.pagination.page} از {data.pagination.lastPage}
+                    صفحه {data.pagination.page} از {data.pagination.totalPages}
                   </span>
 
                   <button
                     onClick={() => setPage((p) => p + 1)}
-                    disabled={page >= data.pagination.lastPage}
+                    disabled={!data.pagination.hasNextPage}
                     className="rounded border border-stroke px-3 py-1.5 text-sm font-medium text-dark hover:bg-gray disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:text-white"
                   >
                     بعدی

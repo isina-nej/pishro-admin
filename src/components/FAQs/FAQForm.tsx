@@ -25,8 +25,8 @@ const FAQForm: React.FC<FAQFormProps> = ({ faqId, isEdit = false }) => {
   const [formData, setFormData] = useState<CreateFAQRequest>({
     question: "",
     answer: "",
-    categoryId: undefined,
-    faqCategory: undefined,
+    categoryId: null,
+    faqCategory: null,
     order: 0,
     published: true,
     featured: false,
@@ -38,8 +38,8 @@ const FAQForm: React.FC<FAQFormProps> = ({ faqId, isEdit = false }) => {
       setFormData({
         question: faq.question,
         answer: faq.answer,
-        categoryId: faq.categoryId || undefined,
-        faqCategory: faq.faqCategory || undefined,
+        categoryId: faq.categoryId || null,
+        faqCategory: faq.faqCategory || null,
         order: faq.order || 0,
         published: faq.published,
         featured: faq.featured,
