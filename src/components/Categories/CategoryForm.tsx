@@ -7,7 +7,7 @@ import {
   useUpdateCategory,
   useCategory,
 } from "@/hooks/api/use-categories";
-import type { CreateCategoryRequest } from "@/types/api";
+import type { CreateCategoryRequest, StatsBox } from "@/types/api";
 
 interface CategoryFormProps {
   categoryId?: string;
@@ -60,6 +60,21 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   useEffect(() => {
     if (isEdit && categoryData) {
       const category = categoryData;
+
+      // Parse statsBoxes from JSON if needed
+      let parsedStatsBoxes: StatsBox[] = [];
+      if (category.statsBoxes) {
+        if (Array.isArray(category.statsBoxes)) {
+          parsedStatsBoxes = category.statsBoxes as unknown as StatsBox[];
+        } else if (typeof category.statsBoxes === 'string') {
+          try {
+            parsedStatsBoxes = JSON.parse(category.statsBoxes) as StatsBox[];
+          } catch {
+            parsedStatsBoxes = [];
+          }
+        }
+      }
+
       setFormData({
         slug: category.slug,
         title: category.title,
@@ -86,7 +101,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         aboutCta1Link: category.aboutCta1Link || "",
         aboutCta2Text: category.aboutCta2Text || "",
         aboutCta2Link: category.aboutCta2Link || "",
-        statsBoxes: category.statsBoxes || [],
+        statsBoxes: parsedStatsBoxes,
         enableUserLevelSection: category.enableUserLevelSection || false,
         published: category.published,
         featured: category.featured,
@@ -131,6 +146,43 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
     }));
   };
 
+  const handleKeywordsChange = (value: string) => {
+    const keywords = value.split(",").map((k) => k.trim()).filter((k) => k);
+    setFormData((prev) => ({ ...prev, metaKeywords: keywords }));
+  };
+
+  const handleTagsChange = (value: string) => {
+    const tags = value.split(",").map((t) => t.trim()).filter((t) => t);
+    setFormData((prev) => ({ ...prev, tagIds: tags }));
+  };
+
+  const addStatsBox = () => {
+    setFormData((prev) => ({
+      ...prev,
+      statsBoxes: [...prev.statsBoxes, { title: "", value: "", icon: "" }],
+    }));
+  };
+
+  const removeStatsBox = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      statsBoxes: prev.statsBoxes.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleStatsBoxChange = (
+    index: number,
+    field: string,
+    value: string,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      statsBoxes: prev.statsBoxes.map((box, i) =>
+        i === index ? { ...box, [field]: value } : box,
+      ),
+    }));
+  };
+
   return (
     <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark">
       <div className="border-b border-stroke px-7 py-4 dark:border-dark-3">
@@ -140,93 +192,161 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="p-7">
-        <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
-          <div className="w-full sm:w-1/2">
+        {/* اطلاعات پایه */}
+        <div className="mb-8">
+          <h4 className="mb-5 text-lg font-semibold text-dark dark:text-white">
+            اطلاعات پایه
+          </h4>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                عنوان <span className="text-red">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                Slug <span className="text-red">*</span>
+              </label>
+              <input
+                type="text"
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                required
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              عنوان <span className="text-red">*</span>
+              توضیحات
             </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
+            <textarea
+              name="description"
+              value={formData.description || ""}
               onChange={handleChange}
-              required
+              rows={4}
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
           </div>
 
-          <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              Slug <span className="text-red">*</span>
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/3">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                آیکون (URL)
+              </label>
+              <input
+                type="text"
+                name="icon"
+                value={formData.icon || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/3">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                تصویر کاور (URL)
+              </label>
+              <input
+                type="text"
+                name="coverImage"
+                value={formData.coverImage || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/3">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                رنگ (Hex Code)
+              </label>
+              <input
+                type="text"
+                name="color"
+                value={formData.color || ""}
+                onChange={handleChange}
+                placeholder="#000000"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                ترتیب نمایش
+              </label>
+              <input
+                type="number"
+                name="order"
+                value={formData.order}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5 flex gap-5">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                name="published"
+                checked={formData.published}
+                onChange={handleChange}
+                className="rounded border-stroke"
+              />
+              <span className="text-body-sm font-medium text-dark dark:text-white">
+                منتشر شده
+              </span>
             </label>
-            <input
-              type="text"
-              name="slug"
-              value={formData.slug}
-              onChange={handleChange}
-              required
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                name="featured"
+                checked={formData.featured}
+                onChange={handleChange}
+                className="rounded border-stroke"
+              />
+              <span className="text-body-sm font-medium text-dark dark:text-white">
+                ویژه
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                name="enableUserLevelSection"
+                checked={formData.enableUserLevelSection}
+                onChange={handleChange}
+                className="rounded border-stroke"
+              />
+              <span className="text-body-sm font-medium text-dark dark:text-white">
+                فعال‌سازی بخش سطح کاربر
+              </span>
+            </label>
           </div>
         </div>
 
-        <div className="mb-5.5">
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            توضیحات
-          </label>
-          <textarea
-            name="description"
-            value={formData.description || ""}
-            onChange={handleChange}
-            rows={4}
-            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-          />
-        </div>
+        {/* تنظیمات SEO */}
+        <div className="mb-8 border-t border-stroke pt-8 dark:border-dark-3">
+          <h4 className="mb-5 text-lg font-semibold text-dark dark:text-white">
+            تنظیمات SEO
+          </h4>
 
-        <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
-          <div className="w-full sm:w-1/3">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              آیکون (URL)
-            </label>
-            <input
-              type="text"
-              name="icon"
-              value={formData.icon || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
-          </div>
-
-          <div className="w-full sm:w-1/3">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر کاور (URL)
-            </label>
-            <input
-              type="text"
-              name="coverImage"
-              value={formData.coverImage || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
-          </div>
-
-          <div className="w-full sm:w-1/3">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              رنگ (Hex Code)
-            </label>
-            <input
-              type="text"
-              name="color"
-              value={formData.color || ""}
-              onChange={handleChange}
-              placeholder="#000000"
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
-          </div>
-        </div>
-
-        <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
-          <div className="w-full sm:w-1/2">
+          <div className="mb-5.5">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
               عنوان متا
             </label>
@@ -239,72 +359,341 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             />
           </div>
 
-          <div className="w-full sm:w-1/2">
+          <div className="mb-5.5">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              ترتیب نمایش
+              توضیحات متا
+            </label>
+            <textarea
+              name="metaDescription"
+              value={formData.metaDescription || ""}
+              onChange={handleChange}
+              rows={3}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              کلمات کلیدی متا (با کاما جدا کنید)
             </label>
             <input
-              type="number"
-              name="order"
-              value={formData.order}
-              onChange={handleChange}
+              type="text"
+              value={(formData.metaKeywords || []).join(", ")}
+              onChange={(e) => handleKeywordsChange(e.target.value)}
+              placeholder="کلمه1, کلمه2, کلمه3"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
           </div>
         </div>
 
-        <div className="mb-5.5">
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            توضیحات متا
-          </label>
-          <textarea
-            name="metaDescription"
-            value={formData.metaDescription || ""}
-            onChange={handleChange}
-            rows={3}
-            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-          />
+        {/* بخش Hero */}
+        <div className="mb-8 border-t border-stroke pt-8 dark:border-dark-3">
+          <h4 className="mb-5 text-lg font-semibold text-dark dark:text-white">
+            بخش Hero
+          </h4>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                عنوان Hero
+              </label>
+              <input
+                type="text"
+                name="heroTitle"
+                value={formData.heroTitle || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                زیرعنوان Hero
+              </label>
+              <input
+                type="text"
+                name="heroSubtitle"
+                value={formData.heroSubtitle || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              توضیحات Hero
+            </label>
+            <textarea
+              name="heroDescription"
+              value={formData.heroDescription || ""}
+              onChange={handleChange}
+              rows={4}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              تصویر Hero (URL)
+            </label>
+            <input
+              type="text"
+              name="heroImage"
+              value={formData.heroImage || ""}
+              onChange={handleChange}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                متن دکمه اول Hero
+              </label>
+              <input
+                type="text"
+                name="heroCta1Text"
+                value={formData.heroCta1Text || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                لینک دکمه اول Hero
+              </label>
+              <input
+                type="text"
+                name="heroCta1Link"
+                value={formData.heroCta1Link || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                متن دکمه دوم Hero
+              </label>
+              <input
+                type="text"
+                name="heroCta2Text"
+                value={formData.heroCta2Text || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                لینک دکمه دوم Hero
+              </label>
+              <input
+                type="text"
+                name="heroCta2Link"
+                value={formData.heroCta2Link || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="mb-5.5 flex gap-5">
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              name="published"
-              checked={formData.published}
-              onChange={handleChange}
-              className="rounded border-stroke"
-            />
-            <span className="text-body-sm font-medium text-dark dark:text-white">
-              منتشر شده
-            </span>
-          </label>
+        {/* بخش About */}
+        <div className="mb-8 border-t border-stroke pt-8 dark:border-dark-3">
+          <h4 className="mb-5 text-lg font-semibold text-dark dark:text-white">
+            بخش About
+          </h4>
 
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              name="featured"
-              checked={formData.featured}
-              onChange={handleChange}
-              className="rounded border-stroke"
-            />
-            <span className="text-body-sm font-medium text-dark dark:text-white">
-              ویژه
-            </span>
-          </label>
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                عنوان اول About
+              </label>
+              <input
+                type="text"
+                name="aboutTitle1"
+                value={formData.aboutTitle1 || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
 
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              name="enableUserLevelSection"
-              checked={formData.enableUserLevelSection}
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                عنوان دوم About
+              </label>
+              <input
+                type="text"
+                name="aboutTitle2"
+                value={formData.aboutTitle2 || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              توضیحات About
+            </label>
+            <textarea
+              name="aboutDescription"
+              value={formData.aboutDescription || ""}
               onChange={handleChange}
-              className="rounded border-stroke"
+              rows={4}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
-            <span className="text-body-sm font-medium text-dark dark:text-white">
-              فعال‌سازی بخش سطح کاربر
-            </span>
-          </label>
+          </div>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              تصویر About (URL)
+            </label>
+            <input
+              type="text"
+              name="aboutImage"
+              value={formData.aboutImage || ""}
+              onChange={handleChange}
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                متن دکمه اول About
+              </label>
+              <input
+                type="text"
+                name="aboutCta1Text"
+                value={formData.aboutCta1Text || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                لینک دکمه اول About
+              </label>
+              <input
+                type="text"
+                name="aboutCta1Link"
+                value={formData.aboutCta1Link || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                متن دکمه دوم About
+              </label>
+              <input
+                type="text"
+                name="aboutCta2Text"
+                value={formData.aboutCta2Text || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2">
+              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                لینک دکمه دوم About
+              </label>
+              <input
+                type="text"
+                name="aboutCta2Link"
+                value={formData.aboutCta2Link || ""}
+                onChange={handleChange}
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* آمار و تگ‌ها */}
+        <div className="mb-8 border-t border-stroke pt-8 dark:border-dark-3">
+          <h4 className="mb-5 text-lg font-semibold text-dark dark:text-white">
+            آمار و تگ‌ها
+          </h4>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              باکس‌های آمار
+            </label>
+            {formData.statsBoxes.map((box, index) => (
+              <div
+                key={index}
+                className="mb-4 flex flex-col gap-3 rounded-[7px] border border-stroke p-4 dark:border-dark-3"
+              >
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <input
+                    type="text"
+                    placeholder="عنوان"
+                    value={box.title}
+                    onChange={(e) =>
+                      handleStatsBoxChange(index, "title", e.target.value)
+                    }
+                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="مقدار"
+                    value={box.value}
+                    onChange={(e) =>
+                      handleStatsBoxChange(index, "value", e.target.value)
+                    }
+                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="آیکون (URL)"
+                    value={box.icon}
+                    onChange={(e) =>
+                      handleStatsBoxChange(index, "icon", e.target.value)
+                    }
+                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeStatsBox(index)}
+                  className="self-start rounded bg-red px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90"
+                >
+                  حذف
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addStatsBox}
+              className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              افزودن باکس آمار
+            </button>
+          </div>
+
+          <div className="mb-5.5">
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              تگ‌ها (با کاما جدا کنید)
+            </label>
+            <input
+              type="text"
+              value={(formData.tagIds || []).join(", ")}
+              onChange={(e) => handleTagsChange(e.target.value)}
+              placeholder="tag1, tag2, tag3"
+              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end gap-3">

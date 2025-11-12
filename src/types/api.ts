@@ -212,10 +212,17 @@ export type CreateBookRequest = Omit<DigitalBook, 'id' | 'createdAt' | 'updatedA
 export type UpdateBookRequest = Partial<CreateBookRequest>;
 
 // Categories
+export interface StatsBox {
+  title: string;
+  value: string;
+  icon: string;
+}
+
 export type CategoriesListResponse = ApiSuccessResponse<PaginatedData<CategoryWithRelations>>;
 export type CategoryResponse = ApiSuccessResponse<CategoryWithRelations>;
-export type CreateCategoryRequest = Omit<Category, 'id' | 'createdAt' | 'updatedAt' | 'tagIds'> & {
+export type CreateCategoryRequest = Omit<Category, 'id' | 'createdAt' | 'updatedAt' | 'tagIds' | 'statsBoxes'> & {
   tagIds?: string[];
+  statsBoxes: StatsBox[];
 };
 export type UpdateCategoryRequest = Partial<CreateCategoryRequest>;
 
