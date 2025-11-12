@@ -2,11 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  useCreateUser,
-  useUpdateUser,
-  useUser,
-} from "@/hooks/api/use-users";
+import { useCreateUser, useUpdateUser, useUser } from "@/hooks/api/use-users";
 import type { CreateUserRequest } from "@/types/api";
 
 interface UserFormProps {
@@ -29,7 +25,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, isEdit = false }) => {
     lastName: "",
     email: "",
     nationalCode: "",
-    birthDate: undefined,
+    birthDate: null,
     avatarUrl: "",
     cardNumber: "",
     shebaNumber: "",
@@ -48,7 +44,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, isEdit = false }) => {
         lastName: user.lastName || "",
         email: user.email || "",
         nationalCode: user.nationalCode || "",
-        birthDate: user.birthDate || undefined,
+        birthDate: user.birthDate || null,
         avatarUrl: user.avatarUrl || "",
         cardNumber: user.cardNumber || "",
         shebaNumber: user.shebaNumber || "",
@@ -89,9 +85,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, isEdit = false }) => {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : value,
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
