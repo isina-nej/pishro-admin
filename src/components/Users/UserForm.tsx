@@ -153,7 +153,6 @@ const UserForm: React.FC<UserFormProps> = ({ userId, isEdit = false }) => {
             >
               <option value="USER">کاربر عادی</option>
               <option value="ADMIN">ادمین</option>
-              <option value="SUPER_ADMIN">سوپر ادمین</option>
             </select>
           </div>
 
