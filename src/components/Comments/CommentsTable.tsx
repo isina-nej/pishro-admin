@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import Link from "next/link";
 
-import { useComments } from "@/hooks/api/use-comments";
+import { useComments, useUpdateComment, useDeleteComment } from "@/hooks/api/use-comments";
 
 import type { CommentWithRelations } from "@/types/api";
 
@@ -14,6 +14,41 @@ const CommentsTable: React.FC = () => {
   const [search, setSearch] = useState("");
 
   const { data, isLoading, error } = useComments({ page, limit: 10, search });
+  const updateComment = useUpdateComment();
+  const deleteComment = useDeleteComment();
+
+  const handleApprove = async (commentId: string) => {
+    if (confirm("آیا از تایید این نظر مطمئن هستید؟")) {
+      try {
+        await updateComment.mutateAsync({ id: commentId, data: { published: true } });
+        alert("نظر با موفقیت تایید شد");
+      } catch (error: any) {
+        alert(error?.message || "خطا در تایید نظر");
+      }
+    }
+  };
+
+  const handleReject = async (commentId: string) => {
+    if (confirm("آیا از رد این نظر مطمئن هستید؟")) {
+      try {
+        await updateComment.mutateAsync({ id: commentId, data: { published: false } });
+        alert("نظر رد شد");
+      } catch (error: any) {
+        alert(error?.message || "خطا در رد نظر");
+      }
+    }
+  };
+
+  const handleDelete = async (commentId: string) => {
+    if (confirm("آیا از حذف این نظر مطمئن هستید؟ این عملیات قابل بازگشت نیست.")) {
+      try {
+        await deleteComment.mutateAsync(commentId);
+        alert("نظر با موفقیت حذف شد");
+      } catch (error: any) {
+        alert(error?.message || "خطا در حذف نظر");
+      }
+    }
+  };
 
   if (error) {
     return (
@@ -157,6 +192,76 @@ const CommentsTable: React.FC = () => {
                               <path d="M11.3787 5.79289L3 14.1716V17H5.82842L14.2071 8.62132L11.3787 5.79289Z" />
                             </svg>
                           </Link>
+
+                          {!comment.published ? (
+                            <button
+                              onClick={() => handleApprove(comment.id)}
+                              className="hover:text-[#219653]"
+                              title="تایید"
+                              disabled={updateComment.isPending}
+                            >
+                              <svg
+                                className="fill-current"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M7.5 10L9.16667 11.6667L12.5 8.33333M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C14.1421 2.5 17.5 5.85786 17.5 10Z"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleReject(comment.id)}
+                              className="hover:text-[#FFA70B]"
+                              title="رد کردن"
+                              disabled={updateComment.isPending}
+                            >
+                              <svg
+                                className="fill-current"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M10 6V10M10 14H10.01M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C14.1421 2.5 17.5 5.85786 17.5 10Z"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => handleDelete(comment.id)}
+                            className="hover:text-[#D34053]"
+                            title="حذف"
+                            disabled={deleteComment.isPending}
+                          >
+                            <svg
+                              className="fill-current"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M8.5 3.5C8.5 3.22386 8.72386 3 9 3H11C11.2761 3 11.5 3.22386 11.5 3.5V4H8.5V3.5ZM7 4V3.5C7 2.39543 7.89543 1.5 9 1.5H11C12.1046 1.5 13 2.39543 13 3.5V4H16.5C16.7761 4 17 4.22386 17 4.5C17 4.77614 16.7761 5 16.5 5H15.9311L15.1305 16.1148C15.0645 17.1836 14.1696 18 13.0986 18H6.90135C5.83045 18 4.93546 17.1836 4.86949 16.1148L4.06888 5H3.5C3.22386 5 3 4.77614 3 4.5C3 4.22386 3.22386 4 3.5 4H7ZM8.5 7.5C8.77614 7.5 9 7.72386 9 8V14C9 14.2761 8.77614 14.5 8.5 14.5C8.22386 14.5 8 14.2761 8 14V8C8 7.72386 8.22386 7.5 8.5 7.5ZM11.5 7.5C11.7761 7.5 12 7.72386 12 8V14C12 14.2761 11.7761 14.5 11.5 14.5C11.2239 14.5 11 14.2761 11 14V8C11 7.72386 11.2239 7.5 11.5 7.5Z"
+                              />
+                            </svg>
+                          </button>
                         </div>
                       </td>
                     </tr>
