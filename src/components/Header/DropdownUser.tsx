@@ -13,8 +13,8 @@ const DropdownUser = () => {
         className="flex items-center gap-4"
         href="#"
       >
-        <span className="h-12 w-12 rounded-full">
-          <Image
+        <span className="h-12 w-12 rounded-full bg-gray-7">
+          {/* <Image
             width={112}
             height={112}
             src="/images/user/avatar-zoom.jpg"
@@ -24,11 +24,11 @@ const DropdownUser = () => {
             }}
             alt="کاربر"
             className="overflow-hidden rounded-full"
-          />
+          /> */}
         </span>
 
         <span className="flex items-center gap-2 font-medium text-dark dark:text-dark-6">
-          <span className="hidden lg:block">امیرحسین</span>
+          <span className="hidden lg:block">ادمین</span>
 
           <svg
             className={`fill-current duration-200 ease-in ${dropdownOpen && "rotate-180"}`}
@@ -51,9 +51,9 @@ const DropdownUser = () => {
       {/* <!-- Dropdown Star --> */}
       {dropdownOpen && (
         <div
-          className={`absolute right-0 mt-7.5 flex w-[280px] flex-col rounded-lg border-[0.5px] border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-gray-dark`}
+          className={`absolute left-[0px] mt-7.5 flex w-[180px] flex-col rounded-lg border-[0.5px] border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-gray-dark`}
         >
-          <div className="flex items-center gap-2.5 px-5 pb-5.5 pt-3.5">
+          {/* <div className="flex items-center gap-2.5 px-5 pb-5.5 pt-3.5">
             <span className="relative block h-12 w-12 rounded-full">
               <Image
                 width={112}
@@ -78,8 +78,8 @@ const DropdownUser = () => {
                 haj.amir.dev@gmail.com
               </span>
             </span>
-          </div>
-          <ul className="flex flex-col gap-1 border-y-[0.5px] border-stroke p-2.5 dark:border-dark-3">
+          </div> */}
+          {/* <ul className="flex flex-col gap-1 border-y-[0.5px] border-stroke p-2.5 dark:border-dark-3">
             <li>
               <Link
                 href="/profile"
@@ -141,9 +141,12 @@ const DropdownUser = () => {
                 تنظیمات حساب
               </Link>
             </li>
-          </ul>
+          </ul> */}
           <div className="p-2.5">
-            <button className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base">
+            <Link
+              href={"/auth/logout"}
+              className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base"
+            >
               <svg
                 className="fill-current"
                 width="18"
@@ -170,7 +173,7 @@ const DropdownUser = () => {
                 </defs>
               </svg>
               خروج
-            </button>
+            </Link>
           </div>
         </div>
       )}
