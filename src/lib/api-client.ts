@@ -80,10 +80,10 @@ apiClient.interceptors.response.use(
         console.error("Unauthorized - clearing token and redirecting to login");
         // Clear token from localStorage
         if (typeof window !== "undefined") {
-          if (!window.location.pathname.includes("/login")) {
+          if (!window.location.pathname.includes("/auth/signin")) {
             localStorage.removeItem("authToken");
             localStorage.removeItem("authUser");
-            window.location.href = "/login";
+            window.location.href = "/auth/signin";
           }
         }
       }

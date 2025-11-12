@@ -53,10 +53,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await logoutService();
-      setUser(null);
     } catch (error) {
       console.error('خطا در خروج:', error);
-      // حتی اگر خطا داشتیم، کاربر را logout کن
+    } finally {
+      // Clear localStorage and reset user state
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('authUser');
+      }
       setUser(null);
     }
   };

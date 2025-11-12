@@ -20,8 +20,8 @@ api.interceptors.response.use(
       // فقط در client-side redirect کن
       if (typeof window !== "undefined") {
         // اگر قبلاً در صفحه login نیستیم
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
+        if (!window.location.pathname.includes("/auth/signin")) {
+          window.location.href = "/auth/signin";
         }
       }
     }

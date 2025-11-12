@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 
 export default function UnauthorizedPage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100" dir="rtl">
@@ -43,9 +43,8 @@ export default function UnauthorizedPage() {
             بازگشت به صفحه اصلی
           </button>
           <button
-            onClick={async () => {
-              await logout();
-              router.push('/login');
+            onClick={() => {
+              router.push('/auth/logout');
             }}
             className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
