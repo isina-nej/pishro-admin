@@ -45,7 +45,6 @@ const AboutPageForm: React.FC<AboutPageFormProps> = ({
     metaDescription: null,
     metaKeywords: [],
     published: true,
-    order: 0,
   });
 
   useEffect(() => {
@@ -73,7 +72,6 @@ const AboutPageForm: React.FC<AboutPageFormProps> = ({
         metaDescription: data.metaDescription || null,
         metaKeywords: data.metaKeywords || [],
         published: data.published,
-        order: data.order,
       });
     }
   }, [isEdit, aboutPageData]);
@@ -110,8 +108,12 @@ const AboutPageForm: React.FC<AboutPageFormProps> = ({
         type === "checkbox"
           ? (e.target as HTMLInputElement).checked
           : type === "number"
-            ? value === "" ? null : Number(value)
-            : value === "" ? null : value,
+            ? value === ""
+              ? null
+              : Number(value)
+            : value === ""
+              ? null
+              : value,
     }));
   };
 
@@ -429,19 +431,6 @@ const AboutPageForm: React.FC<AboutPageFormProps> = ({
                 منتشر شده
               </span>
             </label>
-          </div>
-
-          <div className="mb-5.5">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              ترتیب نمایش
-            </label>
-            <input
-              type="number"
-              name="order"
-              value={formData.order}
-              onChange={handleChange}
-              className="w-60 rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
           </div>
         </div>
 
