@@ -89,7 +89,7 @@ const InvestmentConsultingTable: React.FC = () => {
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <p className="text-dark dark:text-white">
-                          {item.heroTitle}
+                          {item.title}
                         </p>
                       </td>
 
@@ -97,7 +97,7 @@ const InvestmentConsultingTable: React.FC = () => {
                         className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === data.items.length - 1 ? "border-b-0" : "border-b"}`}
                       >
                         <p className="line-clamp-2 text-dark dark:text-white">
-                          {item.heroSubtitle}
+                          {item.description}
                         </p>
                       </td>
 

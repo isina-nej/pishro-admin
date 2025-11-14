@@ -37,6 +37,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ newsId, isEdit = false }) => {
     tagIds: [],
     featured: false,
     readingTime: null,
+    aboutPageId: null,
   });
 
   useEffect(() => {
@@ -57,6 +58,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ newsId, isEdit = false }) => {
         tagIds: news.tagIds || [],
         featured: news.featured,
         readingTime: news.readingTime || null,
+        aboutPageId: news.aboutPageId || null,
       });
     }
   }, [isEdit, newsData]);

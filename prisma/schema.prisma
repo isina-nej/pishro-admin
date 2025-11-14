@@ -696,6 +696,7 @@ model AboutPage {
   metaKeywords    String[] @default([])
 
   published Boolean @default(true)
+  order     Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

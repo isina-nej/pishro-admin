@@ -24,6 +24,10 @@ const HomeLandingForm: React.FC<HomeLandingFormProps> = ({
   const { data: homeLandingData } = useHomeLandingDetail(homeLandingId || "");
 
   const [formData, setFormData] = useState<CreateHomeLandingRequest>({
+    mainHeroTitle: null,
+    mainHeroSubtitle: null,
+    mainHeroCta1Text: null,
+    mainHeroCta1Link: null,
     heroTitle: "",
     heroSubtitle: null,
     heroDescription: null,
@@ -48,6 +52,10 @@ const HomeLandingForm: React.FC<HomeLandingFormProps> = ({
     if (isEdit && homeLandingData) {
       const data = homeLandingData;
       setFormData({
+        mainHeroTitle: data.mainHeroTitle || null,
+        mainHeroSubtitle: data.mainHeroSubtitle || null,
+        mainHeroCta1Text: data.mainHeroCta1Text || null,
+        mainHeroCta1Link: data.mainHeroCta1Link || null,
         heroTitle: data.heroTitle,
         heroSubtitle: data.heroSubtitle || null,
         heroDescription: data.heroDescription || null,
