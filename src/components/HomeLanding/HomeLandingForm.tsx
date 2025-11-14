@@ -85,11 +85,12 @@ const HomeLandingForm: React.FC<HomeLandingFormProps> = ({
       if (isEdit && homeLandingId) {
         await updateHomeLanding.mutateAsync({ id: homeLandingId, data: formData });
         alert("صفحه لندینگ با موفقیت به‌روزرسانی شد");
+        router.refresh();
       } else {
         await createHomeLanding.mutateAsync(formData);
         alert("صفحه لندینگ با موفقیت ایجاد شد");
+        router.refresh();
       }
-      router.push("/home-landing");
     } catch (error: any) {
       alert(error?.message || "خطا در ذخیره صفحه");
       console.error(error);
@@ -336,14 +337,6 @@ const HomeLandingForm: React.FC<HomeLandingFormProps> = ({
         </div>
 
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => router.push("/home-landing")}
-            className="rounded bg-gray px-6 py-2.5 font-medium text-dark hover:bg-opacity-90"
-          >
-            انصراف
-          </button>
-
           <button
             type="submit"
             disabled={createHomeLanding.isPending || updateHomeLanding.isPending}

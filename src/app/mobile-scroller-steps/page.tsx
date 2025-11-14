@@ -1,24 +1,54 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
-
-import MobileScrollerStepsTable from "@/components/MobileScrollerSteps/MobileScrollerStepsTable";
-
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "مدیریت مراحل اسکرولر موبایل | پنل ادمین پیشرو",
-
-  description: "مدیریت مراحل انیمیشن اسکرولر موبایل",
-};
+import MobileScrollerStepForm from "@/components/MobileScrollerSteps/MobileScrollerStepForm";
+import { useMobileScrollerSteps } from "@/hooks/api";
 
 const MobileScrollerStepsPage = () => {
+  const router = useRouter();
+  const { data, isLoading, error } = useMobileScrollerSteps({ page: 1, limit: 1 });
+  const [stepId, setStepId] = useState<string | undefined>(undefined);
+  const [isEdit, setIsEdit] = useState(false);
+
+  useEffect(() => {
+    if (data?.items && data.items.length > 0) {
+      setStepId(data.items[0].id);
+      setIsEdit(true);
+    } else if (data?.items && data.items.length === 0) {
+      setIsEdit(false);
+    }
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <DefaultLayout>
+        <Breadcrumb pageName="مراحل اسکرولر موبایل" />
+        <div className="rounded-[10px] border border-stroke bg-white p-7 text-center">
+          <p>در حال بارگذاری...</p>
+        </div>
+      </DefaultLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DefaultLayout>
+        <Breadcrumb pageName="مراحل اسکرولر موبایل" />
+        <div className="rounded-[10px] border border-stroke bg-white p-7">
+          <p className="text-danger">خطا در بارگذاری اطلاعات</p>
+        </div>
+      </DefaultLayout>
+    );
+  }
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="مراحل اسکرولر موبایل" />
-
       <div className="flex flex-col gap-10">
-        <MobileScrollerStepsTable />
+        <MobileScrollerStepForm stepId={stepId} isEdit={isEdit} />
       </div>
     </DefaultLayout>
   );

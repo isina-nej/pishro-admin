@@ -92,7 +92,7 @@ const InvestmentPlansForm: React.FC<InvestmentPlansFormProps> = ({
         await createInvestmentPlans.mutateAsync(submitData);
         alert("صفحه سبدهای سرمایه‌گذاری با موفقیت ایجاد شد");
       }
-      router.push("/investment-plans");
+      router.refresh();
     } catch (error: any) {
       alert(error?.message || "خطا در ذخیره صفحه");
       console.error(error);
@@ -378,14 +378,6 @@ const InvestmentPlansForm: React.FC<InvestmentPlansFormProps> = ({
         </div>
 
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => router.push("/investment-plans")}
-            className="rounded bg-gray px-6 py-2.5 font-medium text-dark hover:bg-opacity-90"
-          >
-            انصراف
-          </button>
-
           <button
             type="submit"
             disabled={createInvestmentPlans.isPending || updateInvestmentPlans.isPending}
