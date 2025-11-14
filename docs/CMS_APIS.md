@@ -10,6 +10,10 @@
 **Input:**
 ```json
 {
+  "mainHeroTitle": "string?",
+  "mainHeroSubtitle": "string?",
+  "mainHeroCta1Text": "string?",
+  "mainHeroCta1Link": "string?",
   "heroTitle": "string",
   "heroSubtitle": "string?",
   "heroDescription": "string?",
@@ -299,6 +303,7 @@
   "title": "string",
   "description": "string",
   "image": "string?",
+  "plansIntroCards": "Json",
   "minAmount": "number",
   "maxAmount": "number",
   "amountStep": "number",
