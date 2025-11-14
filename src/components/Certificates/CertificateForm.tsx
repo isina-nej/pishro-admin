@@ -35,8 +35,8 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
   });
 
   useEffect(() => {
-    if (isEdit && certData?.data) {
-      const cert = certData.data;
+    if (isEdit && certData) {
+      const cert = certData;
       setFormData({
         aboutPageId: cert.aboutPageId,
         title: cert.title,
@@ -141,7 +141,7 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
           </label>
           <textarea
             name="description"
-            value={formData.description}
+            value={formData.description || ""}
             onChange={handleChange}
             rows={3}
             placeholder="توضیحات درباره گواهینامه"

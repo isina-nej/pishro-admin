@@ -35,8 +35,8 @@ const InvestmentTagForm: React.FC<InvestmentTagFormProps> = ({
   });
 
   useEffect(() => {
-    if (isEdit && tagData?.data) {
-      const tag = tagData.data;
+    if (isEdit && tagData) {
+      const tag = tagData;
       setFormData({
         investmentPlansId: tag.investmentPlansId,
         title: tag.title,
@@ -143,7 +143,7 @@ const InvestmentTagForm: React.FC<InvestmentTagFormProps> = ({
             <input
               type="text"
               name="color"
-              value={formData.color}
+              value={formData.color || ""}
               onChange={handleChange}
               placeholder="مثال: #FF5733 یا bg-blue-500"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -158,7 +158,7 @@ const InvestmentTagForm: React.FC<InvestmentTagFormProps> = ({
             <input
               type="text"
               name="icon"
-              value={formData.icon}
+              value={formData.icon || ""}
               onChange={handleChange}
               placeholder="مثال: Check, Star, TrendingUp"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"

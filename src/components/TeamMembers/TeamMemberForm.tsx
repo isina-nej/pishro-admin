@@ -43,8 +43,8 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
   const [specialtyInput, setSpecialtyInput] = useState("");
 
   useEffect(() => {
-    if (isEdit && memberData?.data) {
-      const member = memberData.data;
+    if (isEdit && memberData) {
+      const member = memberData;
       setFormData({
         aboutPageId: member.aboutPageId,
         name: member.name,
@@ -190,7 +190,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
             <input
               type="text"
               name="image"
-              value={formData.image}
+              value={formData.image || ""}
               onChange={handleChange}
               placeholder="https://example.com/image.jpg"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -205,7 +205,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
             <input
               type="text"
               name="education"
-              value={formData.education}
+              value={formData.education || ""}
               onChange={handleChange}
               placeholder="مثال: کارشناسی ارشد مهندسی کامپیوتر"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -220,7 +220,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
           </label>
           <textarea
             name="description"
-            value={formData.description}
+            value={formData.description || ""}
             onChange={handleChange}
             rows={4}
             placeholder="توضیحات درباره عضو تیم"
@@ -278,7 +278,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
             <input
               type="text"
               name="linkedinUrl"
-              value={formData.linkedinUrl}
+              value={formData.linkedinUrl || ""}
               onChange={handleChange}
               placeholder="https://linkedin.com/in/..."
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -292,7 +292,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
             <input
               type="email"
               name="emailUrl"
-              value={formData.emailUrl}
+              value={formData.emailUrl || ""}
               onChange={handleChange}
               placeholder="email@example.com"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -306,7 +306,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
             <input
               type="text"
               name="twitterUrl"
-              value={formData.twitterUrl}
+              value={formData.twitterUrl || ""}
               onChange={handleChange}
               placeholder="https://twitter.com/..."
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"

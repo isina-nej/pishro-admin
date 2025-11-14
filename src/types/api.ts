@@ -504,7 +504,7 @@ export type ResumeItemResponse = ApiSuccessResponse<ResumeItem>;
 export type CreateResumeItemRequest = Omit<ResumeItem, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateResumeItemRequest = Partial<CreateResumeItemRequest>;
 
-export interface ResumeItemQueryParams extends PaginationParams {
+export interface ResumeItemQueryParams extends PaginationParams, SearchParams {
   aboutPageId?: string;
   published?: boolean;
 }
@@ -515,7 +515,7 @@ export type TeamMemberResponse = ApiSuccessResponse<TeamMember>;
 export type CreateTeamMemberRequest = Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateTeamMemberRequest = Partial<CreateTeamMemberRequest>;
 
-export interface TeamMemberQueryParams extends PaginationParams {
+export interface TeamMemberQueryParams extends PaginationParams, SearchParams {
   aboutPageId?: string;
   published?: boolean;
 }
@@ -526,7 +526,7 @@ export type CertificateResponse = ApiSuccessResponse<Certificate>;
 export type CreateCertificateRequest = Omit<Certificate, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateCertificateRequest = Partial<CreateCertificateRequest>;
 
-export interface CertificateQueryParams extends PaginationParams {
+export interface CertificateQueryParams extends PaginationParams, SearchParams {
   aboutPageId?: string;
   published?: boolean;
 }
@@ -562,7 +562,7 @@ export type InvestmentPlanResponse = ApiSuccessResponse<InvestmentPlan>;
 export type CreateInvestmentPlanRequest = Omit<InvestmentPlan, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateInvestmentPlanRequest = Partial<CreateInvestmentPlanRequest>;
 
-export interface InvestmentPlanQueryParams extends PaginationParams {
+export interface InvestmentPlanQueryParams extends PaginationParams, SearchParams {
   investmentPlansId?: string;
   published?: boolean;
 }
@@ -573,7 +573,7 @@ export type InvestmentTagResponse = ApiSuccessResponse<InvestmentTag>;
 export type CreateInvestmentTagRequest = Omit<InvestmentTag, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateInvestmentTagRequest = Partial<CreateInvestmentTagRequest>;
 
-export interface InvestmentTagQueryParams extends PaginationParams {
+export interface InvestmentTagQueryParams extends PaginationParams, SearchParams {
   investmentPlansId?: string;
   published?: boolean;
 }

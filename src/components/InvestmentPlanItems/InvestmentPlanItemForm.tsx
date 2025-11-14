@@ -35,8 +35,8 @@ const InvestmentPlanItemForm: React.FC<InvestmentPlanItemFormProps> = ({
   });
 
   useEffect(() => {
-    if (isEdit && planData?.data) {
-      const plan = planData.data;
+    if (isEdit && planData) {
+      const plan = planData;
       setFormData({
         investmentPlansId: plan.investmentPlansId,
         label: plan.label,
@@ -143,7 +143,7 @@ const InvestmentPlanItemForm: React.FC<InvestmentPlanItemFormProps> = ({
             <input
               type="text"
               name="icon"
-              value={formData.icon}
+              value={formData.icon || ""}
               onChange={handleChange}
               placeholder="مثال: Bitcoin, LineChart, PieChart"
               className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition placeholder:text-dark-6 focus:border-primary active:border-primary disabled:cursor-default dark:border-dark-3 dark:bg-dark-2 dark:text-white"
@@ -175,7 +175,7 @@ const InvestmentPlanItemForm: React.FC<InvestmentPlanItemFormProps> = ({
           </label>
           <textarea
             name="description"
-            value={formData.description}
+            value={formData.description || ""}
             onChange={handleChange}
             rows={4}
             placeholder="توضیحات درباره این نوع سبد سرمایه‌گذاری"
