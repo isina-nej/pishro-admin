@@ -242,39 +242,9 @@ const menuGroups = [
         ),
         label: "صفحه اصلی",
         route: "/home-landing",
-      },
-      {
-        icon: (
-          <svg
-            className="fill-current"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 6C8 5.44772 8.44772 5 9 5H15C15.5523 5 16 5.44772 16 6C16 6.55228 15.5523 7 15 7H9C8.44772 7 8 6.55228 8 6Z"
-              fill=""
-            />
-            <path
-              d="M9 9C8.44772 9 8 9.44772 8 10C8 10.5523 8.44772 11 9 11H15C15.5523 11 16 10.5523 16 10C16 9.44772 15.5523 9 15 9H9Z"
-              fill=""
-            />
-            <path
-              d="M8 14C8 13.4477 8.44772 13 9 13H11C11.5523 13 12 13.4477 12 14C12 14.5523 11.5523 15 11 15H9C8.44772 15 8 14.5523 8 14Z"
-              fill=""
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M6 3C4.34315 3 3 4.34315 3 6V18C3 19.6569 4.34315 21 6 21H18C19.6569 21 21 19.6569 21 18V6C21 4.34315 19.6569 3 18 3H6ZM18 5H6C5.44772 5 5 5.44772 5 6V18C5 18.5523 5.44772 19 6 19H18C18.5523 19 19 18.5523 19 18V6C19 5.44772 18.5523 5 18 5Z"
-              fill=""
-            />
-          </svg>
-        ),
-        label: "مراحل اسکرولر",
-        route: "/mobile-scroller-steps",
+        children: [
+          { label: "مراحل اسکرولر", route: "/home-landing/scroller" }
+        ],
       },
       {
         icon: (

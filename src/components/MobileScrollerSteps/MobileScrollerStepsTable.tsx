@@ -126,7 +126,7 @@ const MobileScrollerStepsTable: React.FC = () => {
                       >
                         <div className="flex items-center gap-3">
                           <Link
-                            href={`/mobile-scroller-steps/edit/${step.id}`}
+                            href={`/home-landing/scroller/edit/${step.id}`}
                             className="hover:text-primary"
                             title="ویرایش"
                           >
