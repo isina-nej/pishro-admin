@@ -74,8 +74,8 @@
   "title": "string",
   "description": "string",
   "imageUrl": "string?",
+  "coverImageUrl": "string?",
   "gradient": "string?",
-  "cards": "Json",
   "order": "number",
   "published": "boolean"
 }
