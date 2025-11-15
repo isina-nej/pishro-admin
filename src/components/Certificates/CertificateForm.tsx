@@ -9,6 +9,7 @@ import {
   useAboutPages,
 } from "@/hooks/api/use-about-page";
 import type { CreateCertificateRequest } from "@/types/api";
+import Image from "next/image";
 
 interface CertificateFormProps {
   certId?: string;
@@ -188,7 +189,7 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
               پیش‌نمایش تصویر
             </label>
             <div className="rounded-lg border border-stroke p-4">
-              <img
+              <Image
                 src={formData.image}
                 alt="Certificate preview"
                 className="max-h-60 rounded object-contain"

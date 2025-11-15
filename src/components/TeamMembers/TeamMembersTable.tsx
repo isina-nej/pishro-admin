@@ -2,14 +2,22 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useTeamMembers, useDeleteTeamMember } from "@/hooks/api/use-about-page";
+import {
+  useTeamMembers,
+  useDeleteTeamMember,
+} from "@/hooks/api/use-about-page";
 import type { TeamMember } from "@/types/api";
+import Image from "next/image";
 
 const TeamMembersTable: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const { data, isLoading, error } = useTeamMembers({ page, limit: 10, search });
+  const { data, isLoading, error } = useTeamMembers({
+    page,
+    limit: 10,
+    search,
+  });
   const deleteTeamMember = useDeleteTeamMember();
 
   const handleDelete = async (id: string) => {
@@ -103,7 +111,7 @@ const TeamMembersTable: React.FC = () => {
                     >
                       <div className="flex items-center gap-3">
                         {member.image && (
-                          <img
+                          <Image
                             src={member.image}
                             alt={member.name}
                             className="h-10 w-10 rounded-full object-cover"
@@ -144,7 +152,7 @@ const TeamMembersTable: React.FC = () => {
                           : "border-b"
                       }`}
                     >
-                      <p className="text-dark dark:text-white text-body-sm">
+                      <p className="text-body-sm text-dark dark:text-white">
                         {member.image ? "✓" : "-"}
                       </p>
                     </td>
@@ -156,7 +164,9 @@ const TeamMembersTable: React.FC = () => {
                           : "border-b"
                       }`}
                     >
-                      <p className="text-dark dark:text-white">{member.order}</p>
+                      <p className="text-dark dark:text-white">
+                        {member.order}
+                      </p>
                     </td>
 
                     <td

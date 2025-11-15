@@ -2,14 +2,22 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useCertificates, useDeleteCertificate } from "@/hooks/api/use-about-page";
+import {
+  useCertificates,
+  useDeleteCertificate,
+} from "@/hooks/api/use-about-page";
 import type { Certificate } from "@/types/api";
+import Image from "next/image";
 
 const CertificatesTable: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const { data, isLoading, error } = useCertificates({ page, limit: 10, search });
+  const { data, isLoading, error } = useCertificates({
+    page,
+    limit: 10,
+    search,
+  });
   const deleteCertificate = useDeleteCertificate();
 
   const handleDelete = async (id: string) => {
@@ -100,7 +108,7 @@ const CertificatesTable: React.FC = () => {
                     >
                       <div className="flex items-center gap-3">
                         {cert.image && (
-                          <img
+                          <Image
                             src={cert.image}
                             alt={cert.title}
                             className="h-12 w-12 rounded object-cover"
@@ -119,7 +127,7 @@ const CertificatesTable: React.FC = () => {
                           : "border-b"
                       }`}
                     >
-                      <p className="text-dark dark:text-white line-clamp-2">
+                      <p className="line-clamp-2 text-dark dark:text-white">
                         {cert.description || "-"}
                       </p>
                     </td>
@@ -131,7 +139,7 @@ const CertificatesTable: React.FC = () => {
                           : "border-b"
                       }`}
                     >
-                      <p className="text-dark dark:text-white text-body-sm">
+                      <p className="text-body-sm text-dark dark:text-white">
                         {cert.image ? "✓" : "-"}
                       </p>
                     </td>
