@@ -87,6 +87,7 @@ model Course {
   enrollments Enrollment[] @relation("CourseEnrollments")
   orderItems  OrderItem[]  @relation("CourseOrderItems")
   quizzes     Quiz[]       @relation("CourseQuizzes")
+  lessons     Lesson[]     @relation("CourseLessons")
 
   @@index([categoryId])
   @@index([published, featured])
@@ -191,6 +192,26 @@ model OrderItem {
   courseId        String @db.ObjectId
   price           Int
   discountPercent Int?
+}
+
+model Lesson {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  course      Course  @relation("CourseLessons", fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    String  @db.ObjectId
+  title       String
+  description String?
+  videoUrl    String
+  thumbnail   String?
+  duration    String? // مدت زمان ویدیو (مثل "45:30")
+  order       Int     @default(0)
+  published   Boolean @default(true)
+  views       Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId, order])
+  @@index([courseId, published])
 }
 
 model NewsArticle {
