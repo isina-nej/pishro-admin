@@ -44,6 +44,7 @@ import type {
   InvestmentPlans,
   InvestmentPlan,
   InvestmentTag,
+  SkyRoomClass,
 } from "@prisma/client";
 
 import type { ApiSuccessResponse, PaginatedData } from "@/lib/api-response";
@@ -89,6 +90,7 @@ export type {
   InvestmentPlans,
   InvestmentPlan,
   InvestmentTag,
+  SkyRoomClass,
 };
 
 /**
@@ -722,5 +724,20 @@ export interface InvestmentTagQueryParams
   extends PaginationParams,
     SearchParams {
   investmentPlansId?: string;
+  published?: boolean;
+}
+
+// SkyRoom Classes - using Prisma type
+export type SkyRoomClassesListResponse = ApiSuccessResponse<
+  PaginatedData<SkyRoomClass>
+>;
+export type SkyRoomClassResponse = ApiSuccessResponse<SkyRoomClass>;
+export type CreateSkyRoomClassRequest = Omit<
+  SkyRoomClass,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type UpdateSkyRoomClassRequest = Partial<CreateSkyRoomClassRequest>;
+
+export interface SkyRoomClassesQueryParams extends PaginationParams, SearchParams {
   published?: boolean;
 }
