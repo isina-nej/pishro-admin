@@ -115,8 +115,9 @@ const TeamMembersTable: React.FC = () => {
                           <Image
                             src={member.image}
                             alt={member.name}
+                            width={40}
+                            height={40}
                             className="h-10 w-10 rounded-full object-cover"
-                            fill
                           />
                         )}
                         <h5 className="font-medium text-dark dark:text-white">

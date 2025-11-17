@@ -94,8 +94,9 @@ const CategoriesTable: React.FC = () => {
                               <Image
                                 src={category.icon}
                                 alt={category.title}
+                                width={40}
+                                height={40}
                                 className="h-full w-full object-cover"
-                                fill
                               />
                             </div>
                           )}

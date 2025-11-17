@@ -121,8 +121,9 @@ const CoursesTable: React.FC = () => {
                               <Image
                                 src={course.img}
                                 alt={course.subject}
+                                width={48}
+                                height={48}
                                 className="h-full w-full object-cover"
-                                fill
                               />
                             </div>
                           )}
