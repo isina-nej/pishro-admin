@@ -19,6 +19,7 @@ import type {
   Quiz,
   QuizQuestion,
   QuizAttempt,
+  Lesson,
   Transaction,
   Enrollment,
   NewsletterSubscriber,
@@ -65,6 +66,7 @@ export type {
   Quiz,
   QuizQuestion,
   QuizAttempt,
+  Lesson,
   Transaction,
   Enrollment,
   NewsletterSubscriber,
@@ -133,6 +135,11 @@ export interface NewsArticleWithRelations extends NewsArticle {
   };
 }
 
+export interface NewsCommentWithRelations extends NewsComment {
+  article?: NewsArticle | null;
+  user?: Omit<User, "passwordHash"> | null;
+}
+
 export interface DigitalBookWithRelations extends DigitalBook {
   relatedTags?: Tag[];
 }
@@ -185,6 +192,10 @@ export interface EnrollmentWithRelations extends Enrollment {
 export interface QuizAttemptWithRelations extends QuizAttempt {
   quiz: Quiz;
   user: Omit<User, "passwordHash">;
+}
+
+export interface LessonWithRelations extends Lesson {
+  course: Course;
 }
 
 /**
@@ -252,6 +263,20 @@ export type CreateNewsRequest = Omit<
   tagIds?: string[];
 };
 export type UpdateNewsRequest = Partial<CreateNewsRequest>;
+
+// News Comments
+export type NewsCommentsListResponse = ApiSuccessResponse<
+  PaginatedData<NewsCommentWithRelations>
+>;
+export type NewsCommentResponse = ApiSuccessResponse<NewsCommentWithRelations>;
+export type CreateNewsCommentRequest = Omit<
+  NewsComment,
+  "id" | "createdAt" | "updatedAt" | "articleId" | "userId" | "likes"
+> & {
+  articleId?: string;
+  userId?: string;
+};
+export type UpdateNewsCommentRequest = Partial<CreateNewsCommentRequest>;
 
 // Digital Books
 export type BooksListResponse = ApiSuccessResponse<
@@ -363,6 +388,17 @@ export type QuizAttemptsListResponse = ApiSuccessResponse<
 >;
 export type QuizAttemptResponse = ApiSuccessResponse<QuizAttemptWithRelations>;
 
+// Lessons
+export type LessonsListResponse = ApiSuccessResponse<
+  PaginatedData<LessonWithRelations>
+>;
+export type LessonResponse = ApiSuccessResponse<LessonWithRelations>;
+export type CreateLessonRequest = Omit<
+  Lesson,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type UpdateLessonRequest = Partial<CreateLessonRequest>;
+
 // Orders
 export type OrdersListResponse = ApiSuccessResponse<
   PaginatedData<OrderWithRelations>
@@ -437,6 +473,11 @@ export interface NewsQueryParams extends PaginationParams, SearchParams {
   featured?: boolean;
 }
 
+export interface NewsCommentsQueryParams extends PaginationParams, SearchParams {
+  articleId?: string;
+  userId?: string;
+}
+
 export interface BooksQueryParams extends PaginationParams, SearchParams {
   category?: string;
   isFeatured?: boolean;
@@ -490,6 +531,11 @@ export interface QuizAttemptsQueryParams extends PaginationParams {
   quizId?: string;
   userId?: string;
   passed?: boolean;
+}
+
+export interface LessonsQueryParams extends PaginationParams, SearchParams {
+  courseId?: string;
+  published?: boolean;
 }
 
 /**
