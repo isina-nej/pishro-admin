@@ -33,8 +33,8 @@ export * from "./use-business-consulting";
 export * from "./use-investment-plans";
 
 // Add more exports as you create additional hook files
-// export * from './use-books';
-// export * from './use-tags';
-// export * from './use-faqs';
+export * from './use-books';
+export * from './use-tags';
+export * from './use-faqs';
 // export * from './use-quizzes';
 // export * from './use-transactions';
