@@ -133,15 +133,13 @@ const SkyRoomClassesTable: React.FC = () => {
                     >
                       <div className="flex items-center gap-3">
                         {skyRoomClass.thumbnail && (
-                          <div className="h-12 w-12 overflow-hidden rounded">
-                            <Image
-                              src={skyRoomClass.thumbnail}
-                              alt={skyRoomClass.title}
-                              width={48}
-                              height={48}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
+                          <Image
+                            src={skyRoomClass.thumbnail}
+                            alt={skyRoomClass.title}
+                            width={48}
+                            height={48}
+                            className="h-12 w-12 rounded object-cover"
+                          />
                         )}
 
                         <div>
