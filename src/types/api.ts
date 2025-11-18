@@ -48,6 +48,8 @@ import type {
   SkyRoomClass,
   Image,
   ImageCategory,
+  InvestmentModelsPage,
+  InvestmentModel,
 } from "@prisma/client";
 
 import type { ApiSuccessResponse, PaginatedData } from "@/lib/api-response";
@@ -97,6 +99,8 @@ export type {
   SkyRoomClass,
   Image,
   ImageCategory,
+  InvestmentModelsPage,
+  InvestmentModel,
 };
 
 /**
@@ -774,6 +778,44 @@ export interface InvestmentTagQueryParams
   extends PaginationParams,
     SearchParams {
   investmentPlansId?: string;
+  published?: boolean;
+}
+
+// Investment Models Page - using Prisma types
+export interface InvestmentModelsPageWithRelations extends InvestmentModelsPage {
+  models?: InvestmentModel[];
+}
+
+export type InvestmentModelsPageListResponse = ApiSuccessResponse<
+  PaginatedData<InvestmentModelsPageWithRelations>
+>;
+export type InvestmentModelsPageResponse = ApiSuccessResponse<InvestmentModelsPageWithRelations>;
+export type CreateInvestmentModelsPageRequest = Omit<
+  InvestmentModelsPage,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type UpdateInvestmentModelsPageRequest = Partial<CreateInvestmentModelsPageRequest>;
+
+export interface InvestmentModelsPageQueryParams extends PaginationParams {
+  published?: boolean;
+}
+
+// Investment Model Items - using Prisma type
+export type InvestmentModelListResponse = ApiSuccessResponse<
+  PaginatedData<InvestmentModel>
+>;
+export type InvestmentModelResponse = ApiSuccessResponse<InvestmentModel>;
+export type CreateInvestmentModelRequest = Omit<
+  InvestmentModel,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type UpdateInvestmentModelRequest = Partial<CreateInvestmentModelRequest>;
+
+export interface InvestmentModelQueryParams
+  extends PaginationParams,
+    SearchParams {
+  investmentModelsPageId?: string;
+  type?: string;
   published?: boolean;
 }
 

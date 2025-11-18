@@ -31,6 +31,7 @@ export * from "./use-mobile-scroller-steps";
 export * from "./use-about-page";
 export * from "./use-business-consulting";
 export * from "./use-investment-plans";
+export * from "./use-investment-models-page";
 
 // Add more exports as you create additional hook files
 export * from './use-books';
