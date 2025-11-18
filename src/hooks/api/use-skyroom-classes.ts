@@ -32,11 +32,40 @@ export function useSkyRoomClasses(params?: SkyRoomClassesQueryParams) {
   return useQuery<SkyRoomClassesListResponse>({
     queryKey: skyRoomClassKeys.list(params),
     queryFn: async () => {
-      const response = await api.get<SkyRoomClassesListResponse>(
+      // Clean up params - remove empty search parameter
+      const cleanParams = { ...params };
+      if (cleanParams.search === "" || cleanParams.search === undefined) {
+        delete cleanParams.search;
+      }
+
+      const response = await api.get<any>(
         "/admin/skyroom-classes",
-        { params }
+        { params: cleanParams }
       );
-      return response;
+
+      // Transform API response to match expected PaginatedData format
+      // The backend returns data as a direct array instead of PaginatedData structure
+      const items = Array.isArray(response.data) ? response.data : [];
+      const page = params?.page || 1;
+      const limit = params?.limit || 10;
+      const total = items.length; // Since backend doesn't provide total count
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        status: response.status,
+        data: {
+          items,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+          },
+        },
+        message: response.message,
+      } as SkyRoomClassesListResponse;
     },
   });
 }
