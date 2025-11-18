@@ -46,6 +46,8 @@ import type {
   InvestmentPlan,
   InvestmentTag,
   SkyRoomClass,
+  Image,
+  ImageCategory,
 } from "@prisma/client";
 
 import type { ApiSuccessResponse, PaginatedData } from "@/lib/api-response";
@@ -93,6 +95,8 @@ export type {
   InvestmentPlan,
   InvestmentTag,
   SkyRoomClass,
+  Image,
+  ImageCategory,
 };
 
 /**
@@ -786,4 +790,46 @@ export type UpdateSkyRoomClassRequest = Partial<CreateSkyRoomClassRequest>;
 
 export interface SkyRoomClassesQueryParams extends PaginationParams, SearchParams {
   published?: boolean;
+}
+
+// Images - Image Upload and Management
+export interface ImageWithRelations extends Image {
+  uploadedBy?: Omit<User, "passwordHash">;
+}
+
+export type ImagesListResponse = ApiSuccessResponse<
+  PaginatedData<ImageWithRelations>
+>;
+export type ImageResponse = ApiSuccessResponse<ImageWithRelations>;
+
+export interface UploadImageRequest {
+  file: File;
+  category: ImageCategory;
+  title?: string;
+  description?: string;
+  alt?: string;
+  tags?: string;
+}
+
+export type UpdateImageRequest = {
+  title?: string;
+  description?: string;
+  alt?: string;
+  tags?: string[];
+  category?: ImageCategory;
+  published?: boolean;
+};
+
+export interface ImagesQueryParams extends PaginationParams, SearchParams {
+  category?: ImageCategory;
+  published?: boolean;
+}
+
+export interface ImageStatsResponse {
+  total: number;
+  byCategory: Array<{
+    category: string;
+    count: number;
+  }>;
+  totalSize: number;
 }

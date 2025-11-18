@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCreateUser, useUpdateUser, useUser } from "@/hooks/api/use-users";
 import type { CreateUserRequest } from "@/types/api";
 import { toast } from "sonner";
+import ImageUpload from "@/components/ImageUpload";
 
 interface UserFormProps {
   userId?: string;
@@ -240,15 +241,16 @@ const UserForm: React.FC<UserFormProps> = ({ userId, isEdit = false }) => {
         </div>
 
         <div className="mb-5.5">
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            آواتار (URL)
-          </label>
-          <input
-            type="text"
+          <ImageUpload
+            label="تصویر پروفایل"
             name="avatarUrl"
             value={formData.avatarUrl || ""}
-            onChange={handleChange}
-            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+            onChange={(url) => setFormData((prev) => ({ ...prev, avatarUrl: url }))}
+            category="PROFILE"
+            showPreview={true}
+            previewWidth={150}
+            previewHeight={150}
+            alt="تصویر پروفایل کاربر"
           />
         </div>
 

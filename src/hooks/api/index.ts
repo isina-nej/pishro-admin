@@ -36,5 +36,6 @@ export * from "./use-investment-plans";
 export * from './use-books';
 export * from './use-tags';
 export * from './use-faqs';
+export * from './use-images';
 // export * from './use-quizzes';
 // export * from './use-transactions';

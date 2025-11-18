@@ -9,6 +9,7 @@ import {
 } from "@/hooks/api/use-categories";
 import { toast } from "sonner";
 import type { CreateCategoryRequest, StatsBox } from "@/types/api";
+import ImageUpload from "@/components/ImageUpload";
 
 interface CategoryFormProps {
   categoryId?: string;
@@ -244,28 +245,30 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
           <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
             <div className="w-full sm:w-1/3">
-              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                آیکون (URL)
-              </label>
-              <input
-                type="text"
+              <ImageUpload
+                label="آیکون دسته‌بندی"
                 name="icon"
                 value={formData.icon || ""}
-                onChange={handleChange}
-                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                onChange={(url) => setFormData((prev) => ({ ...prev, icon: url }))}
+                category="LANDING"
+                showPreview={true}
+                previewWidth={100}
+                previewHeight={100}
+                alt="آیکون دسته‌بندی"
               />
             </div>
 
             <div className="w-full sm:w-1/3">
-              <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                تصویر کاور (URL)
-              </label>
-              <input
-                type="text"
+              <ImageUpload
+                label="تصویر کاور"
                 name="coverImage"
                 value={formData.coverImage || ""}
-                onChange={handleChange}
-                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                onChange={(url) => setFormData((prev) => ({ ...prev, coverImage: url }))}
+                category="LANDING"
+                showPreview={true}
+                previewWidth={120}
+                previewHeight={80}
+                alt="تصویر کاور دسته‌بندی"
               />
             </div>
 
@@ -435,15 +438,16 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           </div>
 
           <div className="mb-5.5">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر Hero (URL)
-            </label>
-            <input
-              type="text"
+            <ImageUpload
+              label="تصویر بخش Hero"
               name="heroImage"
               value={formData.heroImage || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              onChange={(url) => setFormData((prev) => ({ ...prev, heroImage: url }))}
+              category="LANDING"
+              showPreview={true}
+              previewWidth={300}
+              previewHeight={200}
+              alt="تصویر Hero دسته‌بندی"
             />
           </div>
 
@@ -552,15 +556,16 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           </div>
 
           <div className="mb-5.5">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر About (URL)
-            </label>
-            <input
-              type="text"
+            <ImageUpload
+              label="تصویر بخش About"
               name="aboutImage"
               value={formData.aboutImage || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              onChange={(url) => setFormData((prev) => ({ ...prev, aboutImage: url }))}
+              category="LANDING"
+              showPreview={true}
+              previewWidth={300}
+              previewHeight={200}
+              alt="تصویر About دسته‌بندی"
             />
           </div>
 
