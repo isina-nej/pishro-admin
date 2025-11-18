@@ -57,6 +57,10 @@ const MobileScrollerStepForm: React.FC<MobileScrollerStepFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Debug: نمایش داده‌های ارسالی
+    console.log("📤 Data being sent to API:", formData);
+    console.log("🔗 Link value:", formData.link, "Type:", typeof formData.link);
+
     try {
       if (isEdit && stepId) {
         await updateStep.mutateAsync({ id: stepId, data: formData });
