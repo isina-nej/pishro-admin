@@ -320,6 +320,7 @@ const menuGroups = [
         route: "/auth/logout",
       },
     ],
+  },
 ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
