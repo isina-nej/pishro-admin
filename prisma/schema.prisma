@@ -1177,3 +1177,20 @@ model InvestmentModel {
 
   @@index([investmentModelsPageId, order])
 }
+
+// مدل برای تنظیمات سایت (Settings)
+model SiteSettings {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Payment Gateway Settings
+  zarinpalMerchantId String? // شناسه پذیرنده زرین‌پال (UUID)
+
+  // General Site Settings
+  siteName        String?
+  siteDescription String?
+  supportEmail    String?
+  supportPhone    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
