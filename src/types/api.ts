@@ -50,6 +50,8 @@ import type {
   ImageCategory,
   InvestmentModelsPage,
   InvestmentModel,
+  Video,
+  VideoProcessingStatus,
 } from "@prisma/client";
 
 import type { ApiSuccessResponse, PaginatedData } from "@/lib/api-response";
@@ -101,6 +103,8 @@ export type {
   ImageCategory,
   InvestmentModelsPage,
   InvestmentModel,
+  Video,
+  VideoProcessingStatus,
 };
 
 /**
@@ -874,4 +878,91 @@ export interface ImageStatsResponse {
     count: number;
   }>;
   totalSize: number;
+}
+
+// Videos - Video Upload and Management
+export interface VideoWithRelations extends Video {
+  uploadedBy?: Omit<User, "passwordHash">;
+}
+
+export type VideosListResponse = ApiSuccessResponse<
+  PaginatedData<VideoWithRelations>
+>;
+export type VideoResponse = ApiSuccessResponse<VideoWithRelations>;
+
+export interface RequestUploadUrlRequest {
+  fileName: string;
+  fileSize: number;
+  fileFormat: string;
+  title: string;
+  description?: string;
+}
+
+export interface RequestUploadUrlResponse {
+  success: true;
+  message: string;
+  data: {
+    uploadUrl: string;
+    videoId: string;
+    storagePath: string;
+    uniqueFileName: string;
+    expiresAt: number;
+    metadata: {
+      title: string;
+      description?: string;
+      fileSize: number;
+      fileFormat: string;
+    };
+  };
+}
+
+export interface UploadVideoToStorageRequest {
+  uploadUrl: string;
+  file: File;
+  onProgress?: (progress: number) => void;
+}
+
+export type CreateVideoRequest = {
+  title: string;
+  description?: string;
+  videoId: string;
+  originalPath: string;
+  fileSize: number;
+  fileFormat: string;
+  duration?: string;
+  width?: number;
+  height?: number;
+  bitrate?: number;
+  codec?: string;
+  frameRate?: number;
+  startProcessing?: boolean;
+};
+
+export type UpdateVideoRequest = {
+  title?: string;
+  description?: string;
+  duration?: string;
+  hlsPlaylistPath?: string;
+  hlsSegmentsPath?: string;
+  processingStatus?: VideoProcessingStatus;
+  processingError?: string;
+  thumbnailPath?: string;
+  width?: number;
+  height?: number;
+  bitrate?: number;
+  codec?: string;
+  frameRate?: number;
+};
+
+export interface VideosQueryParams extends PaginationParams, SearchParams {
+  status?: VideoProcessingStatus;
+}
+
+export interface VideoStatsResponse {
+  total: number;
+  byStatus: {
+    [key in VideoProcessingStatus]?: number;
+  };
+  totalSize: number;
+  totalDuration: string;
 }
