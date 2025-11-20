@@ -4,13 +4,14 @@ import { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import { VideoUploader } from "@/components/Video/videoUploader";
-import { useVideos, useDeleteVideo } from "@/hooks/useVideos";
-import type { Video } from "@prisma/client";
+import { useVideos, useDeleteVideo } from "@/hooks/api/use-videos";
 
 const VideosPage = () => {
   const [page, setPage] = useState(1);
-  const { data: videosData, isLoading } = useVideos({ page, limit: 10 });
+  const { data: videosResponse, isLoading } = useVideos({ page, limit: 10 });
   const deleteMutation = useDeleteVideo();
+
+  const videosData = videosResponse?.data;
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -55,7 +56,7 @@ const VideosPage = () => {
       <div className="flex flex-col gap-10">
         {/* آپلود ویدیوی جدید */}
         <VideoUploader
-          onUploadComplete={(video: Video) => {
+          onUploadComplete={(video: any) => {
             alert(`ویدیو "${video.title}" با موفقیت آپلود شد!`);
           }}
         />

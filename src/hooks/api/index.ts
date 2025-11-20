@@ -38,5 +38,6 @@ export * from './use-books';
 export * from './use-tags';
 export * from './use-faqs';
 export * from './use-images';
+export * from './use-videos';
 // export * from './use-quizzes';
 // export * from './use-transactions';

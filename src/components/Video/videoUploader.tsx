@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useCompleteVideoUpload } from "@/hooks/useVideos";
+import { useCompleteVideoUpload } from "@/hooks/api/use-videos";
 import type { Video } from "@prisma/client";
 
 interface VideoUploaderProps {
@@ -64,7 +64,7 @@ export function VideoUploader({
     }
 
     try {
-      const video = await uploadMutation.mutateAsync({
+      const response = await uploadMutation.mutateAsync({
         file: selectedFile,
         title: title.trim(),
         description: description.trim() || undefined,
@@ -84,7 +84,7 @@ export function VideoUploader({
         fileInputRef.current.value = "";
       }
 
-      onUploadComplete?.(video);
+      onUploadComplete?.(response.data);
     } catch (error) {
       console.error("Upload error:", error);
       onError?.(error as Error);
