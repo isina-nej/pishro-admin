@@ -30,6 +30,12 @@ import {
   FaNewspaper,
   FaComments,
   FaBookOpen,
+  FaImage,
+  FaCog,
+  FaEnvelope,
+  FaList,
+  FaFileInvoice,
+  FaLayerGroup,
 } from "react-icons/fa";
 
 interface SidebarProps {
@@ -69,6 +75,36 @@ const menuGroups = [
     ],
   },
   {
+    name: "مدیریت محتوا",
+    menuItems: [
+      {
+        icon: <FaTags className="w-5 h-5" />,
+        label: "برچسب‌ها",
+        route: "/tags",
+      },
+      {
+        icon: <FaLayerGroup className="w-5 h-5" />,
+        label: "دسته‌بندی‌ها",
+        route: "/categories",
+      },
+      {
+        icon: <FaFileAlt className="w-5 h-5" />,
+        label: "محتوای صفحات",
+        route: "/page-content",
+      },
+      {
+        icon: <FaInfoCircle className="w-5 h-5" />,
+        label: "صفحه درباره ما",
+        route: "/about-page",
+      },
+      {
+        icon: <FaHome className="w-5 h-5" />,
+        label: "صفحه لندینگ",
+        route: "/home-landing",
+      },
+    ],
+  },
+  {
     name: "آموزش و دوره‌ها",
     menuItems: [
       {
@@ -78,6 +114,7 @@ const menuGroups = [
         children: [
           { label: "لیست کورس‌ها", route: "/courses" },
           { label: "دسته‌بندی کورس‌ها", route: "/course-categories" },
+          { label: "درس‌ها", route: "/lessons" },
         ],
       },
       {
@@ -88,12 +125,12 @@ const menuGroups = [
       {
         icon: <FaClipboardList className="w-5 h-5" />,
         label: "آزمون‌ها",
-        route: "/exams",
-      },
-      {
-        icon: <FaVideo className="w-5 h-5" />,
-        label: "ویدیوها",
-        route: "/videos",
+        route: "#",
+        children: [
+          { label: "لیست آزمون‌ها", route: "/quizzes" },
+          { label: "سوالات", route: "/quiz-questions" },
+          { label: "تلاش‌های آزمون", route: "/quiz-attempts" },
+        ],
       },
       {
         icon: (
@@ -129,61 +166,29 @@ const menuGroups = [
         label: "کتاب‌ها",
         route: "/books",
       },
-    ],
-  },
-  {
-    name: "کاربران و دسترسی",
-    menuItems: [
       {
-        icon: <FaUsers className="w-5 h-5" />,
-        label: "کاربران",
-        route: "/users",
-      },
-      {
-        icon: <FaUserShield className="w-5 h-5" />,
-        label: "نقش‌ها",
-        route: "/roles",
-      },
-      {
-        icon: <FaLock className="w-5 h-5" />,
-        label: "دسترسی‌ها",
-        route: "/permissions",
+        icon: <FaCertificate className="w-5 h-5" />,
+        label: "گواهینامه‌ها",
+        route: "/certificates",
       },
     ],
   },
   {
-    name: "مالی",
+    name: "اخبار و نظرات",
     menuItems: [
-      {
-        icon: <FaShoppingCart className="w-5 h-5" />,
-        label: "سفارشات",
-        route: "/orders",
-      },
-      {
-        icon: <FaMoneyBillWave className="w-5 h-5" />,
-        label: "تراکنش‌ها",
-        route: "/transactions",
-      },
-    ],
-  },
-  {
-    name: "محتوا و بلاگ",
-    menuItems: [
-      {
-        icon: <FaBook className="w-5 h-5" />,
-        label: "بلاگ",
-        route: "#",
-        children: [
-          { label: "پست‌ها", route: "/blogs" },
-          { label: "دسته‌بندی‌ها", route: "/blog-categories" },
-          { label: "نظرات", route: "/comments" },
-          { label: "تگ‌ها", route: "/tags" },
-        ],
-      },
       {
         icon: <FaNewspaper className="w-5 h-5" />,
-        label: "اخبار و مقالات",
+        label: "اخبار",
         route: "/news",
+      },
+      {
+        icon: <FaComments className="w-5 h-5" />,
+        label: "نظرات",
+        route: "#",
+        children: [
+          { label: "نظرات دوره‌ها", route: "/comments" },
+          { label: "نظرات اخبار", route: "/news-comments" },
+        ],
       },
     ],
   },
@@ -193,7 +198,11 @@ const menuGroups = [
       {
         icon: <FaChartLine className="w-5 h-5" />,
         label: "مدل‌های سرمایه‌گذاری",
-        route: "/investment-models",
+        route: "#",
+        children: [
+          { label: "لیست مدل‌ها", route: "/investment-models" },
+          { label: "صفحه مدل‌ها", route: "/investment-models-page" },
+        ],
       },
       {
         icon: (
@@ -212,33 +221,12 @@ const menuGroups = [
           </svg>
         ),
         label: "سبدهای سرمایه‌گذاری",
-        route: "/investment-plans",
-      },
-      {
-        icon: (
-          <svg
-            className="fill-current"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M3.17157 3.17157C2 4.34315 2 6.22876 2 10V14C2 17.7712 2 19.6569 3.17157 20.8284C4.34315 22 6.22876 22 10 22H14C17.7712 22 19.6569 22 20.8284 20.8284C22 19.6569 22 17.7712 22 14V10C22 6.22876 22 4.34315 20.8284 3.17157C19.6569 2 17.7712 2 14 2H10C6.22876 2 4.34315 2 3.17157 3.17157ZM13.75 8C13.75 7.58579 13.4142 7.25 13 7.25H7C6.58579 7.25 6.25 7.58579 6.25 8C6.25 8.41421 6.58579 8.75 7 8.75H13C13.4142 8.75 13.75 8.41421 13.75 8ZM17 11.25C17.4142 11.25 17.75 11.5858 17.75 12C17.75 12.4142 17.4142 12.75 17 12.75H7C6.58579 12.75 6.25 12.4142 6.25 12C6.25 11.5858 6.58579 11.25 7 11.25H17ZM13.75 16C13.75 15.5858 13.4142 15.25 13 15.25H7C6.58579 15.25 6.25 15.5858 6.25 16C6.25 16.4142 6.58579 16.75 7 16.75H13C13.4142 16.75 13.75 16.4142 13.75 16Z"
-              fill=""
-            />
-          </svg>
-        ),
-        label: "آیتم‌های طرح سرمایه‌گذاری",
-        route: "/investment-plan-items",
-      },
-      {
-        icon: <FaTags className="w-5 h-5" />,
-        label: "برچسب‌های سرمایه‌گذاری",
-        route: "/investment-tags",
+        route: "#",
+        children: [
+          { label: "لیست سبدها", route: "/investment-plans" },
+          { label: "آیتم‌های طرح", route: "/investment-plan-items" },
+          { label: "برچسب‌های سرمایه‌گذاری", route: "/investment-tags" },
+        ],
       },
       {
         icon: (
@@ -260,42 +248,99 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "مشاوره سرمایه‌گذاری",
+        label: "مشاوره کسب‌وکار",
         route: "/business-consulting",
       },
     ],
   },
   {
-    name: "صفحات سایت",
+    name: "کاربران و تیم",
     menuItems: [
       {
-        icon: <FaHome className="w-5 h-5" />,
-        label: "صفحه اصلی",
-        route: "#",
-        children: [
-          { label: "مراحل اسکرولر موبایل", route: "/mobile-scroller-steps" },
-        ],
+        icon: <FaUsers className="w-5 h-5" />,
+        label: "کاربران",
+        route: "/users",
       },
       {
-        icon: <FaInfoCircle className="w-5 h-5" />,
-        label: "درباره ما",
-        route: "#",
-        children: [
-          { label: "گواهینامه‌ها", route: "/certificates" },
-          { label: "اعضای تیم", route: "/team-members" },
-          { label: "آیتم‌های رزومه", route: "/resume-items" },
-        ],
+        icon: <FaUserTie className="w-5 h-5" />,
+        label: "اعضای تیم",
+        route: "/team-members",
+      },
+    ],
+  },
+  {
+    name: "مالی",
+    menuItems: [
+      {
+        icon: <FaShoppingCart className="w-5 h-5" />,
+        label: "سفارشات",
+        route: "/orders",
+      },
+      {
+        icon: <FaMoneyBillWave className="w-5 h-5" />,
+        label: "تراکنش‌ها",
+        route: "/transactions",
+      },
+    ],
+  },
+  {
+    name: "ارتباطات",
+    menuItems: [
+      {
+        icon: <FaEnvelope className="w-5 h-5" />,
+        label: "مشترکین خبرنامه",
+        route: "/newsletter-subscribers",
+      },
+      {
+        icon: <FaQuestionCircle className="w-5 h-5" />,
+        label: "سوالات متداول",
+        route: "/faqs",
+      },
+    ],
+  },
+  {
+    name: "رسانه و آپلود",
+    menuItems: [
+      {
+        icon: <FaImage className="w-5 h-5" />,
+        label: "تصاویر",
+        route: "/images",
+      },
+      {
+        icon: <FaVideo className="w-5 h-5" />,
+        label: "ویدیوها",
+        route: "/videos",
+      },
+    ],
+  },
+  {
+    name: "ابزارها و رابط کاربری",
+    menuItems: [
+      {
+        icon: <FaMobileAlt className="w-5 h-5" />,
+        label: "مراحل اسکرولر موبایل",
+        route: "/mobile-scroller-steps",
+      },
+      {
+        icon: <FaFileInvoice className="w-5 h-5" />,
+        label: "آیتم‌های رزومه",
+        route: "/resume-items",
+      },
+    ],
+  },
+  {
+    name: "تنظیمات سیستم",
+    menuItems: [
+      {
+        icon: <FaCog className="w-5 h-5" />,
+        label: "تنظیمات",
+        route: "/settings",
       },
     ],
   },
   {
     name: "سایر",
     menuItems: [
-      {
-        icon: <FaQuestionCircle className="w-5 h-5" />,
-        label: "سوالات متداول",
-        route: "/faqs",
-      },
       {
         icon: (
           <svg
