@@ -319,7 +319,7 @@ const menuGroups = [
       {
         icon: <FaMobileAlt className="w-5 h-5" />,
         label: "مراحل اسکرولر موبایل",
-        route: "/mobile-scroller-steps",
+        route: "/home-landing/scroller",
       },
       {
         icon: <FaFileInvoice className="w-5 h-5" />,
@@ -334,7 +334,7 @@ const menuGroups = [
       {
         icon: <FaCog className="w-5 h-5" />,
         label: "تنظیمات",
-        route: "/settings",
+        route: "/pages/settings",
       },
     ],
   },
