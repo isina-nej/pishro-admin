@@ -916,6 +916,39 @@ export interface RequestUploadUrlResponse {
   };
 }
 
+// Generic File (Books) upload request for admin
+export interface RequestFileUploadUrlRequest {
+  fileName: string;
+  fileSize: number;
+  fileFormat: string;
+  resourceType: 'cover' | 'file' | 'audio';
+  title?: string;
+}
+
+export interface RequestFileUploadUrlResponse {
+  success: true;
+  message: string;
+  data: {
+    uploadUrl: string;
+    fileId: string;
+    storagePath: string;
+    uniqueFileName: string;
+    expiresAt: number;
+    metadata: {
+      title?: string;
+      fileSize: number;
+      fileFormat: string;
+      resourceType: string;
+    };
+  };
+}
+
+export interface UploadFileToStorageRequest {
+  uploadUrl: string;
+  file: File;
+  onProgress?: (progress: number) => void;
+}
+
 export interface UploadVideoToStorageRequest {
   uploadUrl: string;
   file: File;

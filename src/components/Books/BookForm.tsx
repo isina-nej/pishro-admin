@@ -6,6 +6,7 @@ import {
   useCreateBook,
   useUpdateBook,
   useBook,
+  useCompleteBookUpload,
 } from "@/hooks/api/use-books";
 import { toast } from "sonner";
 import type { CreateBookRequest } from "@/types/api";
@@ -43,6 +44,14 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     audioUrl: "",
     tagIds: [],
   });
+
+  const coverUploader = useCompleteBookUpload();
+  const fileUploader = useCompleteBookUpload();
+  const audioUploader = useCompleteBookUpload();
+
+  const [coverProgress, setCoverProgress] = useState(0);
+  const [fileProgress, setFileProgress] = useState(0);
+  const [audioProgress, setAudioProgress] = useState(0);
 
   useEffect(() => {
     if (isEdit && bookData) {
@@ -106,6 +115,39 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
             : value,
     }));
   };
+
+  const handleFileSelectAndUpload = async (file: File, type: 'cover' | 'file' | 'audio') => {
+    if (!file) return;
+
+    // client-side validation
+    const maxSizes = {
+      cover: 100 * 1024 * 1024,
+      file: 20 * 1024 * 1024 * 1024,
+      audio: 5 * 1024 * 1024 * 1024,
+    };
+
+    if (file.size > maxSizes[type]) {
+      alert(`حجم فایل بیشتر از حد مجاز است: ${Math.floor(maxSizes[type] / (1024 * 1024))}MB`);
+      return;
+    }
+
+    try {
+      const uploader = type === 'cover' ? coverUploader : type === 'file' ? fileUploader : audioUploader;
+      const result = await uploader.mutateAsync({ file, resourceType: type, title: formData.title || undefined, onProgress: (stage, progress) => {
+        if (type === 'cover') setCoverProgress(progress);
+        if (type === 'file') setFileProgress(progress);
+        if (type === 'audio') setAudioProgress(progress);
+      } });
+
+      // set storage path returned by backend
+      if (type === 'cover') setFormData(prev => ({ ...prev, cover: result.storagePath }));
+      if (type === 'file') setFormData(prev => ({ ...prev, fileUrl: result.storagePath }));
+      if (type === 'audio') setFormData(prev => ({ ...prev, audioUrl: result.storagePath }));
+    } catch (error) {
+      console.error('Upload failed', error);
+      alert('خطا در آپلود فایل');
+    }
+  }
 
   const handleArrayAdd = (
     field: "formats" | "status" | "tags",
@@ -299,15 +341,65 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر جلد (URL)
+              تصویر جلد (URL یا فایل)
             </label>
-            <input
-              type="text"
-              name="cover"
-              value={formData.cover || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="cover"
+                value={formData.cover || ""}
+                onChange={handleChange}
+                placeholder="آدرس یا مسیر فایل ذخیره‌شده"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <label className="rounded bg-primary px-3 py-2 text-white cursor-pointer">
+                انتخاب فایل
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFileSelectAndUpload(f, 'cover');
+                  }}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            {coverProgress > 0 && (
+              <div className="mt-2">
+                <div className="text-sm">آپلود: {coverProgress}%</div>
+                <div className="h-2.5 w-full rounded-full bg-gray-200">
+                  <div className="h-2.5 rounded-full bg-blue-600" style={{ width: `${coverProgress}%` }} />
+                </div>
+              </div>
+            )}
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!formData.cover) return;
+                  try {
+                    const res = await fetch('/api/admin/books/download-url', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ filePath: formData.cover }),
+                    });
+                    const json = await res.json();
+                    if (json.data && json.data.url) {
+                      window.open(json.data.url, '_blank');
+                    } else {
+                      alert('خطا در دریافت آدرس نمایش');
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    alert('خطا در دریافت آدرس نمایش');
+                  }
+                }}
+                className="rounded bg-gray px-4 py-2 text-dark"
+              >
+                نمایش
+              </button>
+            </div>
           </div>
 
           <div className="w-full sm:w-1/2">
@@ -327,28 +419,74 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک فایل
+              لینک فایل یا آپلود فایل
             </label>
-            <input
-              type="text"
-              name="fileUrl"
-              value={formData.fileUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="fileUrl"
+                value={formData.fileUrl || ""}
+                onChange={handleChange}
+                placeholder="آدرس فایل یا مسیر ذخیره‌شده"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <label className="rounded bg-primary px-3 py-2 text-white cursor-pointer">
+                انتخاب فایل
+                <input
+                  type="file"
+                  accept="application/pdf,application/epub+zip,application/x-mobipocket-ebook,application/x-azw3,.mobi,.epub,.pdf"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFileSelectAndUpload(f, 'file');
+                  }}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            {fileProgress > 0 && (
+              <div className="mt-2">
+                <div className="text-sm">آپلود: {fileProgress}%</div>
+                <div className="h-2.5 w-full rounded-full bg-gray-200">
+                  <div className="h-2.5 rounded-full bg-blue-600" style={{ width: `${fileProgress}%` }} />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک صوتی
+              لینک صوتی یا آپلود
             </label>
-            <input
-              type="text"
-              name="audioUrl"
-              value={formData.audioUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="audioUrl"
+                value={formData.audioUrl || ""}
+                onChange={handleChange}
+                placeholder="آدرس صوت یا مسیر ذخیره‌شده"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <label className="rounded bg-primary px-3 py-2 text-white cursor-pointer">
+                انتخاب فایل
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFileSelectAndUpload(f, 'audio');
+                  }}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            {audioProgress > 0 && (
+              <div className="mt-2">
+                <div className="text-sm">آپلود: {audioProgress}%</div>
+                <div className="h-2.5 w-full rounded-full bg-gray-200">
+                  <div className="h-2.5 rounded-full bg-blue-600" style={{ width: `${audioProgress}%` }} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

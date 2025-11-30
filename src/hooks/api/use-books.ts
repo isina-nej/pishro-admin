@@ -7,6 +7,9 @@ import type {
   CreateBookRequest,
   UpdateBookRequest,
   BooksQueryParams,
+  RequestFileUploadUrlRequest,
+  RequestFileUploadUrlResponse,
+  UploadFileToStorageRequest,
 } from '@/types/api';
 
 /**
@@ -98,6 +101,84 @@ export function useDeleteBook() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: booksKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Request signed upload URL for book resources (cover / file / audio)
+ */
+export function useRequestBookUploadUrl() {
+  return useMutation({
+    mutationFn: async (data: RequestFileUploadUrlRequest) => {
+      const response = await api.post<RequestFileUploadUrlResponse>('/admin/books/upload-url', data);
+      return response;
+    },
+  });
+}
+
+/**
+ * Upload file to storage (direct PUT to signed URL)
+ */
+export function useUploadFileToStorage() {
+  return useMutation({
+    mutationFn: async ({ uploadUrl, file, onProgress }: UploadFileToStorageRequest) => {
+      const xhr = new XMLHttpRequest();
+
+      return new Promise<void>((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable && onProgress) {
+            const progress = Math.round((e.loaded * 100) / e.total);
+            onProgress(progress);
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Upload failed'));
+        });
+
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.send(file);
+      });
+    },
+  });
+}
+
+/**
+ * Short helper to perform the full upload flow (request URL + upload + return storage path)
+ */
+export function useCompleteBookUpload() {
+  const requestUploadUrl = useRequestBookUploadUrl();
+  const uploadToStorage = useUploadFileToStorage();
+
+  return useMutation({
+    mutationFn: async ({ file, resourceType, title, onProgress }: { file: File; resourceType: 'cover' | 'file' | 'audio'; title?: string; onProgress?: (stage: string, progress: number) => void }) => {
+      onProgress?.('requesting_url', 0);
+
+      const fileExtension = file.name.split('.').pop() || '';
+
+      const uploadUrlData = await requestUploadUrl.mutateAsync({
+        fileName: file.name,
+        fileSize: file.size,
+        fileFormat: fileExtension,
+        resourceType,
+        title,
+      });
+
+      onProgress?.('uploading', 0);
+      await uploadToStorage.mutateAsync({ uploadUrl: uploadUrlData.data.uploadUrl, file, onProgress: (p: number) => onProgress?.('uploading', p) });
+
+      onProgress?.('completed', 100);
+      return uploadUrlData.data; // contains storagePath
     },
   });
 }
