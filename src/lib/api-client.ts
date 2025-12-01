@@ -11,10 +11,13 @@ import type { ApiResponse } from "./api-response";
  * Centralized configuration for all API requests to external backend
  */
 
-// Base URL configuration - connects directly to backend API
-// CORS has been fixed on the backend, so we can make direct requests
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.pishrosarmaye.com/api";
+// Base URL configuration - connects to backend API. For deployments where the backend
+// domain is different from admin origin and CORS is not configured, you can force
+// using a same-origin proxy (Next.js server) by setting NEXT_PUBLIC_FORCE_LOCAL_API=1.
+const FORCE_LOCAL_API = process.env.NEXT_PUBLIC_FORCE_LOCAL_API === '1';
+const BASE_URL = FORCE_LOCAL_API
+  ? '' // same-origin (relative) paths -> e.g /api/auth/session will be proxied by admin Next.js
+  : process.env.NEXT_PUBLIC_API_URL || "https://www.pishrosarmaye.com/api";
 
 // Create Axios instance
 const apiClient: AxiosInstance = axios.create({

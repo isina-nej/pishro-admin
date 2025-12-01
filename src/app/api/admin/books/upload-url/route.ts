@@ -134,7 +134,14 @@ export async function POST(request: Request) {
       });
 
       const expiresIn = 60 * 60; // 1 hour
-      const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
+      let uploadUrl: string;
+      try {
+        uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
+      } catch (s3Error) {
+        // Provide a more detailed error response for easier troubleshooting
+        console.error('[DEBUG upload-url] getSignedUrl failed', { s3Error: s3Error && (s3Error as any).message });
+        return new NextResponse(JSON.stringify({ message: 'Failed to generate signed URL', details: (s3Error as any)?.message || String(s3Error) }), { status: 502, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
+      }
 
       const storagePath = key; // relative path in bucket
       // When using a public endpoint, include the bucket name in the public URL
@@ -175,6 +182,9 @@ export async function POST(request: Request) {
     const resBody = await res.text();
     let parsed: any = resBody;
     try { parsed = JSON.parse(resBody); } catch (e) { parsed = resBody; }
+    if (!res.ok) {
+      console.error('[DEBUG upload-url] Backend upload-url proxy returned error', { backendUrl, status: res.status, body: resBody });
+    }
     return new NextResponse(JSON.stringify(parsed), { status: res.status, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
   } catch (error) {
   console.error('Books upload-url server error:', error);

@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   try {
     console.log('[DEBUG upload] incoming POST');
     if (!hasS3Config()) {
-      return new NextResponse(JSON.stringify({ message: 'S3 not configured' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
+      return new NextResponse(JSON.stringify({ message: 'S3 not configured on this server (set S3_ENDPOINT, S3_BUCKET_NAME, S3_ACCESS_KEY_ID, and S3_SECRET_ACCESS_KEY), or use admin upload URL proxy to backend for signing.' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
     }
 
     // parse multipart form data; Next.js provides request.formData() which returns web-standard FormData
@@ -89,6 +89,13 @@ export async function POST(request: Request) {
 
     const contentType = inferContentType(ext || (file.type || ''));
 
+    // Basic size limit checks - limit to 100MB for covers and 256MB for 'file' resource types
+    const sizeLimits: Record<string, number> = { cover: 100 * 1024 * 1024, file: 256 * 1024 * 1024, audio: 5 * 1024 * 1024 * 1024 };
+    const max = sizeLimits[resourceType] ?? 256 * 1024 * 1024;
+    if (fileSize > max) {
+      return new NextResponse(JSON.stringify({ message: `File too large for resource type ${resourceType}. Limit is ${max} bytes.` }), { status: 413, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
+    }
+
     // Build S3 client
     const s3Client = new S3Client({
       region: S3_REGION,
@@ -97,12 +104,24 @@ export async function POST(request: Request) {
       forcePathStyle: true,
     });
 
-    // Read file body to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
+    // Read file body to ArrayBuffer (careful with large files)
+    // Note: For very large files, consider implementing streaming or multipart upload to avoid memory pressure.
+    let buffer: Uint8Array;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      buffer = new Uint8Array(arrayBuffer);
+    } catch (err) {
+      console.error('[DEBUG upload] Failed to read file body', err);
+      return new NextResponse(JSON.stringify({ message: 'Failed to read uploaded file body' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
+    }
 
     const command = new PutObjectCommand({ Bucket: S3_BUCKET_NAME, Key: key, ContentType: contentType, Body: buffer });
-    await s3Client.send(command);
+    try {
+      await s3Client.send(command);
+    } catch (err) {
+      console.error('[DEBUG upload] S3 upload failed', err);
+      return new NextResponse(JSON.stringify({ message: 'S3 upload failed', details: (err as any)?.message || String(err) }), { status: 502, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
+    }
 
     const storagePath = key;
     const storageUrl = (S3_PUBLIC_ENDPOINT || S3_ENDPOINT || '').replace(/\/$/, '') + '/' + S3_BUCKET_NAME + '/' + storagePath;

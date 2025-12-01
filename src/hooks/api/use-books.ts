@@ -125,8 +125,21 @@ export function useRequestBookUploadUrl() {
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Upload URL request failed: ${res.status} - ${text}`);
+        // Try to parse JSON error body and throw a clear message
+        const ct = res.headers.get('content-type') || '';
+        let errText = `Upload URL request failed: ${res.status}`;
+        try {
+          if (ct.includes('application/json')) {
+            const jsonErr = await res.json();
+            errText = `Upload URL request failed: ${res.status} - ${jsonErr.message || JSON.stringify(jsonErr)}`;
+          } else {
+            const text = await res.text();
+            errText = `Upload URL request failed: ${res.status} - ${text}`;
+          }
+        } catch (parseErr) {
+          errText = `Upload URL request failed: ${res.status} - unable to read error body`;
+        }
+        throw new Error(errText);
       }
 
       const json = await res.json();
@@ -186,6 +199,8 @@ export function useUploadFileToStorage() {
             // Send Authorization header if we have auth token
             const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
             fallbackXhr.open('POST', '/api/admin/books/upload');
+            // Send credentials (cookie based session) with request
+            fallbackXhr.withCredentials = true;
             if (token) fallbackXhr.setRequestHeader('Authorization', `Bearer ${token}`);
             fallbackXhr.send(fd);
           } catch (e) {
