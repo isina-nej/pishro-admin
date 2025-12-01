@@ -438,6 +438,41 @@
   }
 }
   - "storageUrl": "https://teh-1.s3.poshtiban.com/videos/books/file_abc123/..." (public accessible URL; includes `S3_BUCKET_NAME` prefix)
+
+  **CORS note (Bucket / Storage provider must allow your admin origin):**
+  If the bucket (poshtiban or S3) does not allow `https://admin.pishrosarmaye.com` as an origin for PUT requests, the browser will block direct PUT uploads even if the presigned URL is valid. Ensure your storage provider/bucket CORS policy includes `https://admin.pishrosarmaye.com` and `PUT` and `Content-Type` headers.
+
+  Example S3-compatible CORS policy (JSON):
+
+  ```json
+  [{
+    "AllowedOrigins": ["https://admin.pishrosarmaye.com"],
+    "AllowedMethods": ["GET","PUT","POST","HEAD","DELETE"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag","x-amz-checksum-crc32"],
+    "MaxAgeSeconds": 3600
+  }]
+  ```
+
+  If you cannot edit bucket CORS, the admin panel will automatically fallback to a server-side upload endpoint (`POST /api/admin/books/upload`) which will upload files from the server to the storage provider.
+
+#### `POST /api/admin/books/upload`
+
+این endpoint به‌عنوان یک fallback برای بارگذاری فایل‌ها از سمت سرور عمل می‌کند؛ زمانی که CORS روی bucket پیکربندی نشده یا مرورگر نتواند مستقیم به URL امضا‌شده PUT کند.
+
+Request (multipart/form-data):
+- `file` (file): باینری فایل
+- `fileName` (string)
+- `fileSize` (number)
+- `resourceType` (string) - یکی از `cover|file|audio`
+- `title` (optional string)
+
+Response (JSON):
+- `success` (boolean)
+- `data` شامل `storageUrl`, `storagePath`, `fileId`, `uniqueFileName`, `metadata`
+
+نکته‌ها:
+- استفاده از presigned URL و PUT مستقیم از مرورگر برای فایل‌های بزرگ و کارآمد توصیه می‌شود. این مسیر fallback ذهنی است برای زمانی که دسترسی به CORS امکان‌پذیر نیست.
 #### `POST /api/admin/books/download-url`
 
 دریافت لینک دانلود (آدرس نمایش) برای منابع ذخیره‌شده (در صورت bucket خصوصی یک لینک presigned GET صادر می‌شود)

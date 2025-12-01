@@ -140,10 +140,61 @@ export function useRequestBookUploadUrl() {
  */
 export function useUploadFileToStorage() {
   return useMutation({
-    mutationFn: async ({ uploadUrl, file, onProgress }: UploadFileToStorageRequest) => {
+    mutationFn: async ({ uploadUrl, file, onProgress, resourceType, title }: UploadFileToStorageRequest) => {
+      // First, try the direct PUT to signed URL (recommended approach)
       const xhr = new XMLHttpRequest();
 
-      return new Promise<void>((resolve, reject) => {
+      const doServerFallbackUpload = (reason?: string) => {
+        return new Promise<any>((resolve, reject) => {
+          try {
+            const fallbackXhr = new XMLHttpRequest();
+            const fd = new FormData();
+            fd.append('file', file, file.name);
+            fd.append('fileName', file.name);
+            fd.append('fileSize', String(file.size));
+            fd.append('resourceType', resourceType ?? 'file');
+            if (title) fd.append('title', title);
+
+            fallbackXhr.upload.addEventListener('progress', (e) => {
+              if (e.lengthComputable && onProgress) {
+                const progress = Math.round((e.loaded * 100) / e.total);
+                onProgress(progress);
+              }
+            });
+
+            fallbackXhr.addEventListener('load', () => {
+              if (fallbackXhr.status >= 200 && fallbackXhr.status < 300) {
+                try {
+                  const parsed = JSON.parse(fallbackXhr.responseText);
+                  // If the server returns metadata, resolve with it
+                  resolve(parsed.data || parsed);
+                } catch (e) {
+                  resolve(undefined);
+                }
+              } else {
+                // forward server reason
+                let msg = `Fallback upload failed with status ${fallbackXhr.status}`;
+                try { msg = `${msg}: ${fallbackXhr.responseText}` } catch(e) {}
+                reject(new Error(msg));
+              }
+            });
+
+            fallbackXhr.addEventListener('error', () => {
+              reject(new Error('Fallback upload failed'));
+            });
+
+            // Send Authorization header if we have auth token
+            const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+            fallbackXhr.open('POST', '/api/admin/books/upload');
+            if (token) fallbackXhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            fallbackXhr.send(fd);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      };
+
+      return new Promise<any>((resolve, reject) => {
         xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable && onProgress) {
             const progress = Math.round((e.loaded * 100) / e.total);
@@ -151,21 +202,43 @@ export function useUploadFileToStorage() {
           }
         });
 
-        xhr.addEventListener('load', () => {
+        xhr.addEventListener('load', async () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
+            // direct PUT succeeded - resolve with undefined to indicate using already-known signed data
+            resolve(undefined);
           } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
+            console.warn('[upload] PUT failed; attempting server-side fallback', { status: xhr.status, uploadUrl });
+            // If PUT failed with a network error or non-2xx status, try server fallback
+            try {
+              const result = await doServerFallbackUpload(`PUT failed ${xhr.status}`);
+              resolve(result);
+            } catch (err) {
+              reject(err instanceof Error ? err : new Error(String(err)));
+            }
           }
         });
 
-        xhr.addEventListener('error', () => {
-          reject(new Error('Upload failed'));
+        xhr.addEventListener('error', async () => {
+          // Network/CORS error: try fallback
+          console.warn('[upload] Network/CORS error on direct PUT; attempting server-side fallback', { uploadUrl });
+          try {
+            const result = await doServerFallbackUpload('Network/CORS error');
+            resolve(result);
+          } catch (err) {
+            reject(err instanceof Error ? err : new Error(String(err)));
+          }
         });
 
-        xhr.open('PUT', uploadUrl);
-        xhr.setRequestHeader('Content-Type', file.type);
-        xhr.send(file);
+        try {
+          xhr.open('PUT', uploadUrl);
+          xhr.setRequestHeader('Content-Type', file.type);
+          xhr.send(file);
+        } catch (err) {
+          // In case opening the request fails (invalid URL / invalid origin), try fallback via promise
+          doServerFallbackUpload(String(err))
+            .then(() => resolve(undefined))
+            .catch((e) => reject(e instanceof Error ? e : new Error(String(e))));
+        }
       });
     },
   });
@@ -193,10 +266,11 @@ export function useCompleteBookUpload() {
       });
 
       onProgress?.('uploading', 0);
-      await uploadToStorage.mutateAsync({ uploadUrl: uploadUrlData.data.uploadUrl, file, onProgress: (p: number) => onProgress?.('uploading', p) });
+      const uploadResult = await uploadToStorage.mutateAsync({ uploadUrl: uploadUrlData.data.uploadUrl, file, resourceType, title, onProgress: (p: number) => onProgress?.('uploading', p) });
 
       onProgress?.('completed', 100);
-      return uploadUrlData.data; // contains storagePath
+      // If server fallback returned storage metadata, prefer it; otherwise return signed-data
+      return uploadResult || uploadUrlData.data; // contains storagePath
     },
   });
 }

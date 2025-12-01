@@ -947,6 +947,8 @@ export interface UploadFileToStorageRequest {
   uploadUrl: string;
   file: File;
   onProgress?: (progress: number) => void;
+  resourceType?: 'cover' | 'file' | 'audio';
+  title?: string;
 }
 
 export interface UploadVideoToStorageRequest {
