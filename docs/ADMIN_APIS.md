@@ -432,6 +432,9 @@
     "uniqueFileName": "..."
   }
 }
+  - "storageUrl": "https://teh-1.s3.poshtiban.com/books/file_abc123/..." (public accessible URL)
+
+
 ```
 
 ---

@@ -140,9 +140,11 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       } });
 
       // set storage path returned by backend
-      if (type === 'cover') setFormData(prev => ({ ...prev, cover: result.storagePath }));
-      if (type === 'file') setFormData(prev => ({ ...prev, fileUrl: result.storagePath }));
-      if (type === 'audio') setFormData(prev => ({ ...prev, audioUrl: result.storagePath }));
+      // Prefer storageUrl (full public URL) if returned, fall back to storagePath
+      const returnedUrl = (result as any).storageUrl || (result as any).storagePath;
+      if (type === 'cover') setFormData(prev => ({ ...prev, cover: returnedUrl }));
+      if (type === 'file') setFormData(prev => ({ ...prev, fileUrl: returnedUrl }));
+      if (type === 'audio') setFormData(prev => ({ ...prev, audioUrl: returnedUrl }));
     } catch (error) {
       console.error('Upload failed', error);
       alert('خطا در آپلود فایل');

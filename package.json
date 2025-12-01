@@ -10,6 +10,9 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.463.0",
+    "@aws-sdk/s3-request-presigner": "^3.463.0",
+    "uuid": "^9.0.0",
     "@auth/prisma-adapter": "^2.11.1",
     "@babel/parser": "^7.28.5",
     "@babel/traverse": "^7.28.5",
