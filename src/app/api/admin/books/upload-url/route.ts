@@ -65,6 +65,13 @@ function inferContentType(ext: string) {
  * Body: { fileName, fileSize, fileFormat, resourceType, title? }
  */
 export async function POST(request: Request) {
+    // Safe debug only: method, origin, and if S3 config is present (don't log secrets)
+    try {
+      const origin = request.headers.get('origin');
+      console.log('[DEBUG upload-url] incoming POST', { origin, route: '/api/admin/books/upload-url', s3Configured: hasS3Config() });
+    } catch (e) {
+      // ignore
+    }
   try {
     let body: any = null;
     try {
@@ -176,5 +183,8 @@ export async function POST(request: Request) {
 }
 
 export async function OPTIONS() {
+  try {
+    console.log('[DEBUG upload-url] OPTIONS preflight', { route: '/api/admin/books/upload-url' });
+  } catch (e) {}
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
