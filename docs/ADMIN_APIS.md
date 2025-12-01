@@ -419,6 +419,11 @@
 - فرمت‌های مجاز: pdf, epub, mobi, mp3 (برای صوت)
 - محدودیت اندازه بسته به نوع پرونده (معمولاً 256MB برای فایل‌ها، بزرگترها به /videos/upload-url تغییر می‌کنند)
 
+**Allowed Formats & Limits (Server-side validation):**
+- cover: jpg, jpeg, png, webp, gif, avif (max 100 MB)
+- file: pdf, epub, mobi, azw3 (max 256 MB)
+- audio: mp3, wav, m4a, ogg (max 5 GB)
+
 **Response:**
 
 ```json

@@ -12,6 +12,14 @@ const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
 const S3_ACCESS_KEY_ID = process.env.S3_ACCESS_KEY_ID;
 const S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY;
 const S3_PUBLIC_ENDPOINT = process.env.S3_PUBLIC_ENDPOINT || S3_ENDPOINT;
+const NEXT_PUBLIC_ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_BASE_URL || '*';
+
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': NEXT_PUBLIC_ALLOWED_ORIGIN,
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+  'Access-Control-Allow-Credentials': 'true',
+};
 
 function hasS3Config() {
   return !!(S3_ENDPOINT && S3_ACCESS_KEY_ID && S3_SECRET_ACCESS_KEY && S3_BUCKET_NAME);
@@ -142,7 +150,7 @@ export async function POST(request: Request) {
             resourceType,
           },
         },
-      });
+      }, { headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
     }
 
     // Otherwise fallback to proxy to configured backend (e.g. NEXT_PUBLIC_API_URL)
@@ -160,9 +168,13 @@ export async function POST(request: Request) {
     const resBody = await res.text();
     let parsed: any = resBody;
     try { parsed = JSON.parse(resBody); } catch (e) { parsed = resBody; }
-    return new NextResponse(JSON.stringify(parsed), { status: res.status, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify(parsed), { status: res.status, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
   } catch (error) {
   console.error('Books upload-url server error:', error);
-    return new NextResponse(JSON.stringify({ message: 'Server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify({ message: 'Server error' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }

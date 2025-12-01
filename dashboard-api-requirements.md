@@ -150,6 +150,20 @@ Query Parameters:
 
 ---
 
+## تنظیمات S3 / Object Storage
+
+برای استفاده از endpoint های آپلود (upload-url و download-url) لازم است متغیرهای محیطی مربوط به Object Storage تنظیم شوند:
+
+- S3_ENDPOINT: آدرس endpoint سرویس S3-compatible (مثلاً https://teh-1.s3.poshtiban.com)
+- S3_REGION: ناحیه/region یا 'default'
+- S3_BUCKET_NAME: نام bucket (مثلاً videos)
+- S3_ACCESS_KEY_ID: کلید دسترسی
+- S3_SECRET_ACCESS_KEY: کلید مخفی
+- S3_PUBLIC_ENDPOINT: (اختیاری) اگر public endpoint متفاوتی برای دسترسی فایل دارید
+
+فقدان این تنظیمات باعث می‌شود که اپ به مسیر backend اصلی برای صدور Presigned URL revert کند یا `download-url` فقط URL ورودی را return کند.
+
+
 ## TypeScript Types (برای مرجع)
 
 ```typescript

@@ -8,6 +8,14 @@ const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
 const S3_ACCESS_KEY_ID = process.env.S3_ACCESS_KEY_ID;
 const S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY;
 const S3_PUBLIC_ENDPOINT = process.env.S3_PUBLIC_ENDPOINT || S3_ENDPOINT;
+const NEXT_PUBLIC_ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_BASE_URL || '*';
+
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': NEXT_PUBLIC_ALLOWED_ORIGIN,
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+  'Access-Control-Allow-Credentials': 'true',
+};
 
 function hasS3Config() {
   return !!(S3_ENDPOINT && S3_ACCESS_KEY_ID && S3_SECRET_ACCESS_KEY && S3_BUCKET_NAME);
@@ -42,6 +50,12 @@ export async function POST(request: Request) {
 
       // If filePath is a full URL containing the bucket+path, extract it
       if (String(filePath).startsWith('http')) {
+        const u = new URL(String(filePath));
+        const s3Host = (S3_PUBLIC_ENDPOINT || S3_ENDPOINT || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+        if (s3Host && !u.hostname.endsWith(s3Host)) {
+          // Not our S3 endpoint - return the URL directly (no presign)
+          return NextResponse.json({ success: true, message: 'External URL', data: { url: filePath } });
+        }
         const extracted = extractBucketAndKeyFromUrl(filePath);
         if (extracted) {
           bucket = extracted.bucket;
@@ -73,7 +87,7 @@ export async function POST(request: Request) {
       const command = new GetObjectCommand({ Bucket: bucket, Key: key });
       const expires = typeof expiresIn === 'number' ? Math.min(Math.max(expiresIn, 30), 60 * 60 * 24) : 60 * 5; // 5 min default
       const url = await getSignedUrl(s3Client, command, { expiresIn: expires });
-      return NextResponse.json({ success: true, message: 'Download URL generated', data: { url, bucket, key, expiresAt: Date.now() + expires * 1000 } });
+      return NextResponse.json({ success: true, message: 'Download URL generated', data: { url, bucket, key, expiresAt: Date.now() + expires * 1000 } }, { headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
     }
 
     // otherwise proxy to backend
@@ -91,9 +105,13 @@ export async function POST(request: Request) {
     const resBody = await res.text();
     let parsed: any = resBody;
     try { parsed = JSON.parse(resBody); } catch (e) { parsed = resBody; }
-    return new NextResponse(JSON.stringify(parsed), { status: res.status, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify(parsed), { status: res.status, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
   } catch (error) {
     console.error('Books download-url server error:', error);
-    return new NextResponse(JSON.stringify({ message: 'Server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify({ message: 'Server error' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
