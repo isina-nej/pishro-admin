@@ -399,6 +399,41 @@
 
 #### `DELETE /api/admin/books/[id]`
 
+#### `POST /api/admin/books/upload-url`
+
+دریافت URL آپلود برای فایل‌های مرتبط با کتاب (جلد / فایل کتاب / صوت)
+
+**Body:**
+
+```json
+{
+  "fileName": "book.pdf",
+  "fileSize": 1234567,
+  "fileFormat": "pdf",
+  "resourceType": "file",
+  "title": "عنوان کتاب"
+}
+```
+
+**Validation:**
+- فرمت‌های مجاز: pdf, epub, mobi, mp3 (برای صوت)
+- محدودیت اندازه بسته به نوع پرونده (معمولاً 256MB برای فایل‌ها، بزرگترها به /videos/upload-url تغییر می‌کنند)
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "URL آپلود با موفقیت ایجاد شد",
+  "data": {
+    "uploadUrl": "https://...",
+    "fileId": "file_abc123",
+    "storagePath": "books/file_abc123/...",
+    "uniqueFileName": "..."
+  }
+}
+```
+
 ---
 
 ### Certificates (گواهینامه‌ها)

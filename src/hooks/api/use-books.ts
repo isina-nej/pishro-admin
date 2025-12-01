@@ -111,8 +111,26 @@ export function useDeleteBook() {
 export function useRequestBookUploadUrl() {
   return useMutation({
     mutationFn: async (data: RequestFileUploadUrlRequest) => {
-      const response = await api.post<RequestFileUploadUrlResponse>('/admin/books/upload-url', data);
-      return response;
+      // Use local Next.js API route as a proxy to the backend upload-url endpoint
+      // This allows the frontend to avoid CORS issues and to fallback when backend doesn't implement the endpoint
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('/api/admin/books/upload-url', {
+        method: 'POST',
+        headers,
+        credentials: 'include', // send cookies to this local route if session is cookie-based
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Upload URL request failed: ${res.status} - ${text}`);
+      }
+
+      const json = await res.json();
+      return json as RequestFileUploadUrlResponse;
     },
   });
 }
