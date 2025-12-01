@@ -23,7 +23,13 @@ function hasS3Config() {
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    let body: any = null;
+    try {
+      body = await request.json();
+    } catch (err) {
+      console.error('[DEBUG] Failed to parse JSON body', err);
+      return new NextResponse(JSON.stringify({ message: 'Invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
     // Basic validation
     const { fileName, fileSize, fileFormat, resourceType, title } = body as any;
     if (!fileName || !fileFormat || !fileSize || !resourceType) {
@@ -58,7 +64,8 @@ export async function POST(request: Request) {
       const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
 
       const storagePath = key; // relative path in bucket
-      const storageUrl = (S3_PUBLIC_ENDPOINT || S3_ENDPOINT || '').replace(/\/$/, '') + '/' + storagePath;
+      // When using a public endpoint, include the bucket name in the public URL
+      const storageUrl = (S3_PUBLIC_ENDPOINT || S3_ENDPOINT || '').replace(/\/$/, '') + '/' + S3_BUCKET_NAME + '/' + storagePath;
 
       return NextResponse.json({
         success: true,
@@ -97,7 +104,7 @@ export async function POST(request: Request) {
     try { parsed = JSON.parse(resBody); } catch (e) { parsed = resBody; }
     return new NextResponse(JSON.stringify(parsed), { status: res.status, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error('Books upload-url server error:', error);
+  console.error('Books upload-url server error:', error);
     return new NextResponse(JSON.stringify({ message: 'Server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }

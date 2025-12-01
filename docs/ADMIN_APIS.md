@@ -432,7 +432,7 @@
     "uniqueFileName": "..."
   }
 }
-  - "storageUrl": "https://teh-1.s3.poshtiban.com/books/file_abc123/..." (public accessible URL)
+  - "storageUrl": "https://teh-1.s3.poshtiban.com/videos/books/file_abc123/..." (public accessible URL; includes `S3_BUCKET_NAME` prefix)
 
 
 ```

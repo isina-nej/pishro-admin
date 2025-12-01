@@ -1,0 +1,10 @@
+HTTP/1.1 404 Not Found
+Date: Mon, 01 Dec 2025 12:24:50 GMT
+Content-Type: application/xml
+Content-Length: 236
+Connection: keep-alive
+x-amz-request-id: tx00000cf95b9929f410143-00692d8912-8a28794-object-store
+Accept-Ranges: bytes
+Strict-Transport-Security: max-age=15724800; includeSubDomains
+
+<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchBucket</Code><BucketName>books</BucketName><RequestId>tx00000cf95b9929f410143-00692d8912-8a28794-object-store</RequestId><HostId>8a28794-object-store-object-store</HostId></Error>
