@@ -17,6 +17,41 @@ function hasS3Config() {
   return !!(S3_ENDPOINT && S3_ACCESS_KEY_ID && S3_SECRET_ACCESS_KEY && S3_BUCKET_NAME);
 }
 
+function normalizeExt(ext: string) {
+  return ext.trim().toLowerCase().replace(/^[.]/, '');
+}
+
+function inferContentType(ext: string) {
+  const e = normalizeExt(ext);
+  switch (e) {
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'png':
+      return 'image/png';
+    case 'webp':
+      return 'image/webp';
+    case 'gif':
+      return 'image/gif';
+    case 'avif':
+      return 'image/avif';
+    case 'pdf':
+      return 'application/pdf';
+    case 'epub':
+      return 'application/epub+zip';
+    case 'mobi':
+    case 'azw3':
+    case 'm4b':
+      return 'application/octet-stream';
+    case 'mp3':
+      return 'audio/mpeg';
+    case 'wav':
+      return 'audio/wav';
+    default:
+      return 'application/octet-stream';
+  }
+}
+
 /**
  * POST /api/admin/books/upload-url
  * Body: { fileName, fileSize, fileFormat, resourceType, title? }
@@ -34,6 +69,28 @@ export async function POST(request: Request) {
     const { fileName, fileSize, fileFormat, resourceType, title } = body as any;
     if (!fileName || !fileFormat || !fileSize || !resourceType) {
       return new NextResponse(JSON.stringify({ message: 'Missing required inputs' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // Basic file format validation
+    const ext = normalizeExt(fileFormat || (fileName.split('.').pop() || ''));
+    const allowedFormats: Record<string, string[]> = {
+      cover: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'],
+      file: ['pdf', 'epub', 'mobi', 'azw3'],
+      audio: ['mp3', 'wav', 'm4a', 'ogg'],
+    };
+    if (!allowedFormats[resourceType] || !allowedFormats[resourceType].includes(ext)) {
+      return new NextResponse(JSON.stringify({ message: 'Unsupported file format' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // Size limits (bytes). These should align with client-side expectations and backend policies
+    const sizeLimits: Record<string, number> = {
+      cover: 100 * 1024 * 1024, // 100 MB
+      file: 256 * 1024 * 1024, // 256 MB for book files
+      audio: 5 * 1024 * 1024 * 1024, // 5 GB
+    };
+    const max = sizeLimits[resourceType] ?? 256 * 1024 * 1024;
+    if (fileSize > max) {
+      return new NextResponse(JSON.stringify({ message: 'File too large' }), { status: 413, headers: { 'Content-Type': 'application/json' } });
     }
 
     // If we have S3 credentials, generate signed URL locally
@@ -54,10 +111,11 @@ export async function POST(request: Request) {
       const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
       const key = `books/${resourceType}/${id}/${safeFileName}`;
 
+      const contentType = body.contentType || inferContentType(ext);
       const command = new PutObjectCommand({
         Bucket: S3_BUCKET_NAME,
         Key: key,
-        ContentType: body.contentType || `application/${fileFormat}`,
+        ContentType: contentType,
       });
 
       const expiresIn = 60 * 60; // 1 hour

@@ -433,6 +433,39 @@
   }
 }
   - "storageUrl": "https://teh-1.s3.poshtiban.com/videos/books/file_abc123/..." (public accessible URL; includes `S3_BUCKET_NAME` prefix)
+#### `POST /api/admin/books/download-url`
+
+دریافت لینک دانلود (آدرس نمایش) برای منابع ذخیره‌شده (در صورت bucket خصوصی یک لینک presigned GET صادر می‌شود)
+
+**Body:**
+
+```json
+{
+  "filePath": "https://teh-1.s3.poshtiban.com/videos/books/file_abc123/...
+  ",
+  "expiresIn": 300
+}
+```
+
+فیلد `filePath` می‌تواند یک `storageUrl` کامل، یا فقط `storagePath` (مثل: `books/file/...`) باشد.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Download URL generated",
+  "data": {
+    "url": "https://teh-1.s3.poshtiban.com/....?X-Amz-...",
+    "bucket": "videos",
+    "key": "books/file/...",
+    "expiresAt": 1600000000000
+  }
+}
+```
+
+---
+
 
 
 ```
