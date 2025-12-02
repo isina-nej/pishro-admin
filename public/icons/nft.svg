@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
+  <rect width="64" height="64" rx="12" fill="#fff0e6"/>
+  <path d="M16 24h32v16H16z" fill="#ff8c42" stroke="#ff6b00" stroke-width="2"/>
+  <text x="32" y="36" font-size="12" text-anchor="middle" fill="#fff" font-family="Arial">NFT</text>
+</svg>

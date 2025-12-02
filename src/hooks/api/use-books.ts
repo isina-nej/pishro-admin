@@ -154,7 +154,10 @@ export function useRequestBookUploadUrl() {
 export function useUploadFileToStorage() {
   return useMutation({
     mutationFn: async ({ uploadUrl, file, onProgress, resourceType, title }: UploadFileToStorageRequest) => {
-      // First, try the direct PUT to signed URL (recommended approach)
+      // If configured, force server-side upload to avoid S3 CORS issues
+      const FORCE_SERVER_UPLOAD = typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_FORCE_SERVER_UPLOAD === 'true');
+
+      // First, try the direct PUT to signed URL (recommended approach) unless forced to use the server-side fallback
       const xhr = new XMLHttpRequest();
 
       const doServerFallbackUpload = (reason?: string) => {
@@ -209,7 +212,19 @@ export function useUploadFileToStorage() {
         });
       };
 
-      return new Promise<any>((resolve, reject) => {
+      return new Promise<any>(async (resolve, reject) => {
+        // If forced, perform server-side upload immediately
+        if (FORCE_SERVER_UPLOAD) {
+          console.info('[upload] FORCE_SERVER_UPLOAD enabled: using server-side upload to avoid direct PUTs');
+          try {
+            const result = await doServerFallbackUpload('FORCE_SERVER_UPLOAD enabled');
+            resolve(result);
+            return;
+          } catch (err) {
+            reject(err instanceof Error ? err : new Error(String(err)));
+            return;
+          }
+        }
         xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable && onProgress) {
             const progress = Math.round((e.loaded * 100) / e.total);

@@ -456,6 +456,24 @@
 
   If you cannot edit bucket CORS, the admin panel will automatically fallback to a server-side upload endpoint (`POST /api/admin/books/upload`) which will upload files from the server to the storage provider.
 
+  ⚠️ Note: When using a public S3 (or S3-compatible) storage, you must configure the bucket's CORS policy to allow your admin origin (e.g. `http://localhost:3000`) to allow direct PUT uploads. If not configured, browsers will block direct PUTs, triggering a server-side fallback.
+
+  Example CORS configuration for S3:
+
+  ```json
+  [
+    {
+      "AllowedHeaders": ["*"],
+
+  If you prefer to always use the server-side upload (e.g., you cannot configure S3 CORS in your environment), set `NEXT_PUBLIC_FORCE_SERVER_UPLOAD=true` in your Next.js environment to force server-side uploads from the admin panel (slower but avoids browser CORS issues).
+      "AllowedMethods": ["GET","PUT","POST","HEAD","DELETE","OPTIONS"],
+      "AllowedOrigins": ["http://localhost:3000","https://www.pishrosarmaye.com"],
+      "ExposeHeaders": ["ETag","Access-Control-Allow-Origin"],
+      "MaxAgeSeconds": 3000
+    }
+  ]
+  ```
+
 #### `POST /api/admin/books/upload`
 
 این endpoint به‌عنوان یک fallback برای بارگذاری فایل‌ها از سمت سرور عمل می‌کند؛ زمانی که CORS روی bucket پیکربندی نشده یا مرورگر نتواند مستقیم به URL امضا‌شده PUT کند.

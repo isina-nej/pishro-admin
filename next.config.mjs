@@ -35,6 +35,14 @@ const nextConfig = {
       }
     ]
   },
+  async rewrites() {
+    return [
+      {
+        source: '/images/courses/placeholder.png',
+        destination: '/images/courses/placeholder.svg',
+      },
+    ];
+  },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },

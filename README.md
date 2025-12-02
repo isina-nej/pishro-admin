@@ -42,6 +42,8 @@ yarn dev
 
 And voila! You're now ready to start developing. **Happy coding**!
 
+Note: If your S3 bucket does not allow cross-origin direct PUT from `http://localhost:3000`, either configure S3 bucket CORS or set the environment variable `NEXT_PUBLIC_FORCE_SERVER_UPLOAD=true` in your `.env.local` to force server-side uploads from the admin panel (this uses POST `/api/admin/books/upload` and avoids browser CORS restrictions).
+
 ## Highlighted Features
 
 **200+ Next.js Dashboard Ul Components and Templates** - includes a variety of prebuilt **Ul elements, components, pages, and examples** crafted with a high-quality design.
