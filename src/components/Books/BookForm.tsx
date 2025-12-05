@@ -133,21 +133,36 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
 
     try {
       const uploader = type === 'cover' ? coverUploader : type === 'file' ? fileUploader : audioUploader;
-      const result = await uploader.mutateAsync({ file, resourceType: type, title: formData.title || undefined, onProgress: (stage, progress) => {
-        if (type === 'cover') setCoverProgress(progress);
-        if (type === 'file') setFileProgress(progress);
-        if (type === 'audio') setAudioProgress(progress);
-      } });
+      const result = await uploader.mutateAsync({
+        file,
+        resourceType: type,
+        title: formData.title || undefined,
+        onProgress: (stage, progress) => {
+          if (type === 'cover') setCoverProgress(progress);
+          if (type === 'file') setFileProgress(progress);
+          if (type === 'audio') setAudioProgress(progress);
+        }
+      });
+
+      console.log('Upload result:', result);
 
       // set storage path returned by backend
       // Prefer storageUrl (full public URL) if returned, fall back to storagePath
       const returnedUrl = (result as any).storageUrl || (result as any).storagePath;
+
+      if (!returnedUrl) {
+        throw new Error('No URL returned from upload');
+      }
+
       if (type === 'cover') setFormData(prev => ({ ...prev, cover: returnedUrl }));
       if (type === 'file') setFormData(prev => ({ ...prev, fileUrl: returnedUrl }));
       if (type === 'audio') setFormData(prev => ({ ...prev, audioUrl: returnedUrl }));
-    } catch (error) {
+
+      toast.success('فایل با موفقیت آپلود شد');
+    } catch (error: any) {
       console.error('Upload failed', error);
-      alert('خطا در آپلود فایل');
+      toast.error(error?.message || 'خطا در آپلود فایل');
+      alert(`خطا در آپلود فایل: ${error?.message || 'Unknown error'}`);
     }
   }
 

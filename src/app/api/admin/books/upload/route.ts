@@ -124,7 +124,8 @@ export async function POST(request: Request) {
     }
 
     const storagePath = key;
-    const storageUrl = (S3_PUBLIC_ENDPOINT || S3_ENDPOINT || '').replace(/\/$/, '') + '/' + S3_BUCKET_NAME + '/' + storagePath;
+    const endpoint = S3_PUBLIC_ENDPOINT || S3_ENDPOINT || '';
+    const storageUrl = endpoint.replace(/\/$/, '') + '/' + S3_BUCKET_NAME + '/' + storagePath;
 
     return new NextResponse(JSON.stringify({ success: true, data: { fileId: id, storagePath, storageUrl, uniqueFileName: `${id}-${safeFileName}`, metadata: { title, fileSize, fileFormat: ext, resourceType } } }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
   } catch (err) {
