@@ -1,0 +1,10 @@
+NEXT_PUBLIC_BASE_URL="https://www.pishrosarmaye.com"
+NEXT_PUBLIC_CMS_URL="https://pishro-admin.vercel.app"
+
+# object server
+S3_REGION="default"
+S3_ENDPOINT="https://teh-1.s3.poshtiban.com"
+S3_ACCESS_KEY_ID="7D3AXRQC6ZQQ9QO4O514"
+S3_SECRET_ACCESS_KEY="qv4TTOeWqRjOlWxp7fJpRcl0akC8hyIYUKEGVYBd"
+S3_BUCKET_NAME="videos"
+S3_PUBLIC_ENDPOINT="https://teh-1.s3.poshtiban.com"
