@@ -10,6 +10,7 @@ import {
 import { toast } from "sonner";
 import type { CreateBookRequest } from "@/types/api";
 import axios from "axios";
+import Image from "next/image";
 
 interface BookFormProps {
   bookId?: string;
@@ -45,14 +46,15 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     tagIds: [],
   });
 
-  const [uploading, setUploading] = useState<{
-    cover: boolean;
-    fileUrl: boolean;
-    audioUrl: boolean;
+  // State to track upload progress (0-100)
+  const [uploadProgress, setUploadProgress] = useState<{
+    cover: number;
+    fileUrl: number;
+    audioUrl: number;
   }>({
-    cover: false,
-    fileUrl: false,
-    audioUrl: false,
+    cover: 0,
+    fileUrl: 0,
+    audioUrl: 0,
   });
 
   useEffect(() => {
@@ -91,27 +93,36 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading((prev) => ({ ...prev, [fieldName]: true }));
+    // Reset progress
+    setUploadProgress((prev) => ({ ...prev, [fieldName]: 1 })); // Start at 1% for visual feedback
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", type);
+    const formDataUpload = new FormData();
+    formDataUpload.append("file", file);
+    formDataUpload.append("type", type);
 
     try {
-      // Assuming the backend is on the same domain or configured in proxy
-      // Adjust URL if needed (e.g., to pishro backend)
       const uploadUrl =
         process.env.NEXT_PUBLIC_API_URL || "https://pishrosarmaye.com";
 
       const response = await axios.post(
         `${uploadUrl}/api/admin/books/upload`,
-        formData,
+        formDataUpload,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            // Add Authorization header if needed (usually handled by cookies/interceptor)
           },
-          withCredentials: true, // Important for session cookies
+          withCredentials: true,
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setUploadProgress((prev) => ({
+                ...prev,
+                [fieldName]: percentCompleted,
+              }));
+            }
+          },
         }
       );
 
@@ -125,8 +136,7 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("خطا در آپلود فایل");
-    } finally {
-      setUploading((prev) => ({ ...prev, [fieldName]: false }));
+      setUploadProgress((prev) => ({ ...prev, [fieldName]: 0 })); // Reset on error
     }
   };
 
@@ -186,6 +196,109 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
+
+  // Helper component for Upload UI
+  const UploadField = ({
+    label,
+    fieldName,
+    type,
+    accept,
+    progress,
+    value,
+  }: {
+    label: string;
+    fieldName: "cover" | "fileUrl" | "audioUrl";
+    type: "image" | "pdf" | "audio";
+    accept: string;
+    progress: number;
+    value: string;
+  }) => (
+    <div className="w-full">
+      <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+        {label}
+      </label>
+      <div className="flex flex-col gap-3">
+        {/* Input for manual URL or showing uploaded URL */}
+        <input
+          type="text"
+          name={fieldName}
+          value={value || ""}
+          onChange={handleChange}
+          placeholder="آدرس URL یا آپلود فایل"
+          className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+        />
+
+        {/* File Input */}
+        <div className="relative">
+          <input
+            type="file"
+            accept={accept}
+            onChange={(e) => handleFileUpload(e, type, fieldName)}
+            className="w-full cursor-pointer rounded border border-stroke bg-white p-2 text-sm file:mr-4 file:cursor-pointer file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3 dark:bg-dark-2 dark:file:bg-primary dark:file:text-white"
+            disabled={progress > 0 && progress < 100}
+          />
+        </div>
+
+        {/* Progress Bar */}
+        {progress > 0 && progress < 100 && (
+          <div className="relative h-4 w-full rounded-full bg-stroke dark:bg-dark-3">
+            <div
+              className="absolute left-0 top-0 h-full rounded-full bg-primary transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            ></div>
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] text-white">
+              {progress}%
+            </span>
+          </div>
+        )}
+
+        {/* Previews */}
+        {value && (
+          <div className="mt-2 rounded border border-stroke p-2 dark:border-dark-3">
+            {type === "image" && (
+              <div className="relative aspect-[3/4] w-24 overflow-hidden rounded">
+                <Image
+                  src={value}
+                  alt="Preview"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
+            {type === "audio" && (
+              <audio controls className="w-full">
+                <source src={value} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            )}
+            {type === "pdf" && (
+              <a
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                مشاهده فایل آپلود شده
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark">
@@ -356,31 +469,14 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
 
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر جلد (Image)
-            </label>
-            <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                name="cover"
-                value={formData.cover || ""}
-                onChange={handleChange}
-                placeholder="آدرس URL یا آپلود فایل"
-                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-              <div className="flex items-center gap-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e, "image", "cover")}
-                  className="w-full rounded border border-stroke p-2 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3"
-                  disabled={uploading.cover}
-                />
-                {uploading.cover && (
-                  <span className="text-sm text-primary">در حال آپلود...</span>
-                )}
-              </div>
-            </div>
+            <UploadField
+              label="تصویر جلد (Image)"
+              fieldName="cover"
+              type="image"
+              accept="image/*"
+              progress={uploadProgress.cover}
+              value={formData.cover || ""}
+            />
           </div>
 
           <div className="w-full sm:w-1/2">
@@ -399,59 +495,25 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
 
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              فایل کتاب (PDF)
-            </label>
-            <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                name="fileUrl"
-                value={formData.fileUrl || ""}
-                onChange={handleChange}
-                placeholder="آدرس URL یا آپلود فایل"
-                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-              <div className="flex items-center gap-3">
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={(e) => handleFileUpload(e, "pdf", "fileUrl")}
-                  className="w-full rounded border border-stroke p-2 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3"
-                  disabled={uploading.fileUrl}
-                />
-                {uploading.fileUrl && (
-                  <span className="text-sm text-primary">در حال آپلود...</span>
-                )}
-              </div>
-            </div>
+            <UploadField
+              label="فایل کتاب (PDF)"
+              fieldName="fileUrl"
+              type="pdf"
+              accept="application/pdf"
+              progress={uploadProgress.fileUrl}
+              value={formData.fileUrl || ""}
+            />
           </div>
 
           <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              فایل صوتی (Audio)
-            </label>
-            <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                name="audioUrl"
-                value={formData.audioUrl || ""}
-                onChange={handleChange}
-                placeholder="آدرس URL یا آپلود فایل"
-                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-              <div className="flex items-center gap-3">
-                <input
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) => handleFileUpload(e, "audio", "audioUrl")}
-                  className="w-full rounded border border-stroke p-2 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3"
-                  disabled={uploading.audioUrl}
-                />
-                {uploading.audioUrl && (
-                  <span className="text-sm text-primary">در حال آپلود...</span>
-                )}
-              </div>
-            </div>
+            <UploadField
+              label="فایل صوتی (Audio)"
+              fieldName="audioUrl"
+              type="audio"
+              accept="audio/*"
+              progress={uploadProgress.audioUrl}
+              value={formData.audioUrl || ""}
+            />
           </div>
         </div>
 
