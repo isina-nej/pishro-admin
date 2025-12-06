@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   useCreateBook,
@@ -28,7 +28,6 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     slug: "",
     author: "",
     description: "",
-    cover: "",
     publisher: "",
     year: new Date().getFullYear(),
     pages: null,
@@ -41,6 +40,7 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     readingTime: "",
     isFeatured: false,
     price: null,
+    cover: "",
     fileUrl: "",
     audioUrl: "",
     tagIds: [],
@@ -97,7 +97,7 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     setUploadProgress((prev) => ({ ...prev, [fieldName]: 1 })); // Start at 1% for visual feedback
 
     const formDataUpload = new FormData();
-    formDataUpload.append("file", file);
+    formDataUpload.append("file", file!);
     formDataUpload.append("type", type);
 
     try {
@@ -212,93 +212,129 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     accept: string;
     progress: number;
     value: string;
-  }) => (
-    <div className="w-full">
-      <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-        {label}
-      </label>
-      <div className="flex flex-col gap-3">
-        {/* Input for manual URL or showing uploaded URL */}
-        <input
-          type="text"
-          name={fieldName}
-          value={value || ""}
-          onChange={handleChange}
-          placeholder="آدرس URL یا آپلود فایل"
-          className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-        />
+  }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
 
-        {/* File Input */}
-        <div className="relative">
+    return (
+      <div className="w-full">
+        <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+          {label}
+        </label>
+        <div className="flex flex-col gap-3">
+          {/* Input for manual URL or showing uploaded URL */}
           <input
-            type="file"
-            accept={accept}
-            onChange={(e) => handleFileUpload(e, type, fieldName)}
-            className="w-full cursor-pointer rounded border border-stroke bg-white p-2 text-sm file:mr-4 file:cursor-pointer file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3 dark:bg-dark-2 dark:file:bg-primary dark:file:text-white"
-            disabled={progress > 0 && progress < 100}
+            type="text"
+            name={fieldName}
+            value={value || ""}
+            onChange={handleChange}
+            placeholder="آدرس URL یا آپلود فایل"
+            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
           />
-        </div>
 
-        {/* Progress Bar */}
-        {progress > 0 && progress < 100 && (
-          <div className="relative h-4 w-full rounded-full bg-stroke dark:bg-dark-3">
-            <div
-              className="absolute left-0 top-0 h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            ></div>
-            <span className="absolute inset-0 flex items-center justify-center text-[10px] text-white">
-              {progress}%
-            </span>
-          </div>
-        )}
-
-        {/* Previews */}
-        {value && (
-          <div className="mt-2 rounded border border-stroke p-2 dark:border-dark-3">
-            {type === "image" && (
-              <div className="relative aspect-[3/4] w-24 overflow-hidden rounded">
-                <Image
-                  src={value}
-                  alt="Preview"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
-            {type === "audio" && (
-              <audio controls className="w-full">
-                <source src={value} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            )}
-            {type === "pdf" && (
-              <a
-                href={value}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 text-primary hover:underline"
+          {/* Custom File Upload Button */}
+          <div className="relative">
+            <input
+              type="file"
+              ref={inputRef}
+              accept={accept}
+              onChange={(e) => handleFileUpload(e, type, fieldName)}
+              className="hidden"
+              disabled={progress > 0 && progress < 100}
+            />
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={progress > 0 && progress < 100}
+              className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-primary bg-gray p-4 text-center text-primary hover:bg-opacity-90 dark:bg-meta-4"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
+                <path
+                  d="M3 16.5V18.75C3 19.3467 3.23705 19.919 3.65901 20.341C4.08097 20.7629 4.65326 21 5.25 21H18.75C19.3467 21 19.919 20.7629 20.341 20.341C20.7629 19.919 21 19.3467 21 18.75V16.5M16.5 7.5L12 3M12 3L7.5 7.5M12 3V16.5"
                   stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                مشاهده فایل آپلود شده
-              </a>
-            )}
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>
+                {progress > 0 && progress < 100
+                  ? "در حال آپلود..."
+                  : "انتخاب فایل از سیستم"}
+              </span>
+            </button>
           </div>
-        )}
+
+          {/* Progress Bar */}
+          {progress > 0 && progress < 100 && (
+            <div className="relative h-4 w-full rounded-full bg-stroke dark:bg-dark-3">
+              <div
+                className="absolute left-0 top-0 h-full rounded-full bg-primary transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              ></div>
+              <span className="absolute inset-0 flex items-center justify-center text-[10px] text-white">
+                {progress}%
+              </span>
+            </div>
+          )}
+
+          {/* Previews */}
+          {value && (
+            <div className="mt-2 rounded border border-stroke p-2 dark:border-dark-3">
+              <p className="mb-2 text-xs text-body-color">پیش‌نمایش:</p>
+              {type === "image" && (
+                <div className="relative aspect-[3/4] w-24 overflow-hidden rounded">
+                  <Image
+                    src={value}
+                    alt="Preview"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              {type === "audio" && (
+                <audio controls className="w-full">
+                  <source src={value} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              )}
+              {type === "pdf" && (
+                <a
+                  href={value}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 text-primary hover:underline"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      d="M19.5 14.25V12C19.5 10.7574 18.4926 9.75 17.25 9.75H13.5V6C13.5 4.75736 12.4926 3.75 11.25 3.75H6.75C5.50736 3.75 4.5 4.75736 4.5 6V18C4.5 19.2426 5.50736 20.25 6.75 20.25H11.25M11.25 20.25H17.25C18.4926 20.25 19.5 19.2426 19.5 18V14.25M11.25 20.25V14.25H19.5M11.25 20.25V14.25M19.5 14.25H18"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  مشاهده فایل آپلود شده
+                </a>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark">
