@@ -4,7 +4,7 @@ import axios from "axios";
 export const api = axios.create({
   // اگر BACKEND_API_URL خالی باشد، از API routes محلی Next.js استفاده می‌شود
   // این کار مشکل CORS را حل می‌کند
-  baseURL: process.env.BACKEND_API_URL || "https://www.pishrosarmaye.com/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || "https://www.pishrosarmaye.com/api",
   withCredentials: true, // 🔥 مهم: برای ارسال و دریافت cookies
   headers: {
     "Content-Type": "application/json",

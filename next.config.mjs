@@ -28,6 +28,19 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Permissions-Policy',
+            value: 'unload=()',
+          },
+        ],
+      },
+    ]
+  },
 };
 
 export default nextConfig;

@@ -14,7 +14,7 @@ import type { ApiResponse } from "./api-response";
 // Base URL configuration - connects directly to backend API
 // CORS has been fixed on the backend, so we can make direct requests
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.pishrosarmaye.com/api";
+  process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || "https://www.pishrosarmaye.com/api";
 
 // Create Axios instance
 const apiClient: AxiosInstance = axios.create({
