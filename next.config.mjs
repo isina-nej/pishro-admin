@@ -22,6 +22,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "pub-b7fd9c30cdbf439183b75041f5f71b92.r2.dev",
         port: ""
+      },
+      {
+        protocol: "https",
+        hostname: "teh-1.s3.poshtiban.com",
+        port: ""
       }
     ]
   },
