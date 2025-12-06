@@ -9,6 +9,7 @@ import {
 } from "@/hooks/api/use-books";
 import { toast } from "sonner";
 import type { CreateBookRequest } from "@/types/api";
+import axios from "axios";
 
 interface BookFormProps {
   bookId?: string;
@@ -44,6 +45,16 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     tagIds: [],
   });
 
+  const [uploading, setUploading] = useState<{
+    cover: boolean;
+    fileUrl: boolean;
+    audioUrl: boolean;
+  }>({
+    cover: false,
+    fileUrl: false,
+    audioUrl: false,
+  });
+
   useEffect(() => {
     if (isEdit && bookData) {
       const book = bookData.data;
@@ -71,6 +82,53 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       });
     }
   }, [isEdit, bookData]);
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "image" | "pdf" | "audio",
+    fieldName: "cover" | "fileUrl" | "audioUrl"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading((prev) => ({ ...prev, [fieldName]: true }));
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+
+    try {
+      // Assuming the backend is on the same domain or configured in proxy
+      // Adjust URL if needed (e.g., to pishro backend)
+      const uploadUrl =
+        process.env.NEXT_PUBLIC_API_URL || "https://pishrosarmaye.com";
+
+      const response = await axios.post(
+        `${uploadUrl}/api/admin/books/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            // Add Authorization header if needed (usually handled by cookies/interceptor)
+          },
+          withCredentials: true, // Important for session cookies
+        }
+      );
+
+      if (response.data.status === "success") {
+        setFormData((prev) => ({
+          ...prev,
+          [fieldName]: response.data.data.url,
+        }));
+        toast.success("فایل با موفقیت آپلود شد");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("خطا در آپلود فایل");
+    } finally {
+      setUploading((prev) => ({ ...prev, [fieldName]: false }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,15 +357,30 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر جلد (URL)
+              تصویر جلد (Image)
             </label>
-            <input
-              type="text"
-              name="cover"
-              value={formData.cover || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                name="cover"
+                value={formData.cover || ""}
+                onChange={handleChange}
+                placeholder="آدرس URL یا آپلود فایل"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, "image", "cover")}
+                  className="w-full rounded border border-stroke p-2 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3"
+                  disabled={uploading.cover}
+                />
+                {uploading.cover && (
+                  <span className="text-sm text-primary">در حال آپلود...</span>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="w-full sm:w-1/2">
@@ -327,28 +400,58 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک فایل
+              فایل کتاب (PDF)
             </label>
-            <input
-              type="text"
-              name="fileUrl"
-              value={formData.fileUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                name="fileUrl"
+                value={formData.fileUrl || ""}
+                onChange={handleChange}
+                placeholder="آدرس URL یا آپلود فایل"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => handleFileUpload(e, "pdf", "fileUrl")}
+                  className="w-full rounded border border-stroke p-2 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3"
+                  disabled={uploading.fileUrl}
+                />
+                {uploading.fileUrl && (
+                  <span className="text-sm text-primary">در حال آپلود...</span>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک صوتی
+              فایل صوتی (Audio)
             </label>
-            <input
-              type="text"
-              name="audioUrl"
-              value={formData.audioUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                name="audioUrl"
+                value={formData.audioUrl || ""}
+                onChange={handleChange}
+                placeholder="آدرس URL یا آپلود فایل"
+                className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => handleFileUpload(e, "audio", "audioUrl")}
+                  className="w-full rounded border border-stroke p-2 text-sm file:mr-4 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-opacity-90 dark:border-dark-3"
+                  disabled={uploading.audioUrl}
+                />
+                {uploading.audioUrl && (
+                  <span className="text-sm text-primary">در حال آپلود...</span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
