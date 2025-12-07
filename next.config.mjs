@@ -1,9 +1,5 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  // When running behind a reverse proxy (Nginx), allow the Host header
-  // provided by the proxy so Next does not reject requests for static assets
-  // with a 400: Bad Request response.
-  trustHostHeader: true,
   images: {
     domains: ["localhost"],
     remotePatterns: [
