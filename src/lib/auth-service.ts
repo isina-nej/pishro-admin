@@ -59,11 +59,12 @@ export async function login(phone: string, password: string): Promise<User> {
       password,
     });
 
-    if (response.status === "success") {
-      return response.data;
+    if (response.data.status === "success") {
+      // API returns structured data under response.data.data
+      return response.data.data as unknown as User;
     }
 
-    throw new Error(response.message || "خطا در ورود");
+    throw new Error(response.data.message || "خطا در ورود");
   } catch (error: any) {
     // مدیریت خطاهای axios
     if (error.response?.data?.message) {
