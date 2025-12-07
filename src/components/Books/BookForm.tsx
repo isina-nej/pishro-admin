@@ -747,7 +747,14 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
 
           <button
             type="submit"
-            disabled={createBook.isPending || updateBook.isPending}
+            disabled={
+              createBook.isPending ||
+              updateBook.isPending ||
+              // disable while any upload in progress
+              ((uploadProgress.cover > 0 && uploadProgress.cover < 100) ||
+                (uploadProgress.fileUrl > 0 && uploadProgress.fileUrl < 100) ||
+                (uploadProgress.audioUrl > 0 && uploadProgress.audioUrl < 100))
+            }
             className="rounded bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
             {createBook.isPending || updateBook.isPending
