@@ -1,4 +1,5 @@
 import { api } from "./api-client";
+import axios from "axios";
 
 // تعریف نوع User بر اساس مستندات API
 export interface User {
@@ -38,10 +39,22 @@ interface SessionResponse {
   user: User;
 }
 
+// Get base URL for auth endpoints (without /api prefix)
+const getAuthBaseURL = (): string => {
+  return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "https://pishrosarmaye.com";
+};
+
+// Create a separate axios instance for auth endpoints
+const authClient = axios.create({
+  baseURL: getAuthBaseURL(),
+  timeout: 30000,
+  withCredentials: true,
+});
+
 // تابع login
 export async function login(phone: string, password: string): Promise<User> {
   try {
-    const response = await api.post<ApiResponse<LoginResponse>>("/auth/login", {
+    const response = await authClient.post<ApiResponse<LoginResponse>>("/api/auth/login", {
       phone,
       password,
     });
@@ -64,10 +77,10 @@ export async function login(phone: string, password: string): Promise<User> {
 export async function checkSession(): Promise<User | null> {
   try {
     const response =
-      await api.get<ApiResponse<SessionResponse>>("/auth/session");
+      await authClient.get<ApiResponse<SessionResponse>>("/auth/session");
 
-    if (response.status === "success") {
-      return response.data.user;
+    if (response.data.status === "success") {
+      return response.data.data.user;
     }
 
     return null;
@@ -81,8 +94,8 @@ export async function checkSession(): Promise<User | null> {
 export async function logout(): Promise<boolean> {
   try {
     const response =
-      await api.post<ApiResponse<{ loggedOut: boolean }>>("/auth/logout");
-    return response.status === "success";
+      await authClient.post<ApiResponse<{ loggedOut: boolean }>>("/api/auth/logout");
+    return response.data.status === "success";
   } catch (error) {
     console.error("خطا در خروج:", error);
     return false;
