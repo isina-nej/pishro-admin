@@ -5,7 +5,7 @@
 [![nextjs admin template](https://cdn.pimjo.com/pishro-2.png)](https://pishro.co/)
 
 **pishro** provides you with a diverse set of dashboard UI components, elements, examples and pages necessary for creating top-notch admin panels or dashboards with **powerful** features and integrations. Whether you are working on a complex web application or a basic website, **pishro** has got you covered.
-
+و
 ### [✨ Visit Website](https://pishro.co/)
 
 ### [🚀 Live Demo](https://demo.pishro.co/)
