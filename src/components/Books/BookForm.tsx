@@ -7,6 +7,8 @@ import {
   useUpdateBook,
   useBook,
 } from "@/hooks/api/use-books";
+import ImageUpload from "@/components/ImageUpload";
+import FileUpload from "@/components/FileUpload";
 import { toast } from "sonner";
 import type { CreateBookRequest } from "@/types/api";
 
@@ -297,18 +299,19 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         </div>
 
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
-          <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر جلد (URL)
-            </label>
-            <input
-              type="text"
-              name="cover"
-              value={formData.cover || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
-          </div>
+            <div className="w-full sm:w-1/2">
+              <ImageUpload
+                label="تصویر جلد"
+                name="cover"
+                value={formData.cover || ""}
+                onChange={(url) => setFormData((prev) => ({ ...prev, cover: url }))}
+                category={"BOOK"}
+                required={false}
+                showPreview={true}
+                previewWidth={120}
+                previewHeight={160}
+              />
+            </div>
 
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
@@ -326,28 +329,28 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
 
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک فایل
-            </label>
-            <input
-              type="text"
+            <FileUpload
+              label="فایل کتاب"
               name="fileUrl"
+              field="book"
               value={formData.fileUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              onChange={(url) => setFormData((prev) => ({ ...prev, fileUrl: url }))}
+              accept="application/pdf,application/epub+zip"
+              maxSize={100}
+              showPreview={false}
             />
           </div>
 
           <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک صوتی
-            </label>
-            <input
-              type="text"
+            <FileUpload
+              label="فایل صوتی"
               name="audioUrl"
+              field="audio"
               value={formData.audioUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              onChange={(url) => setFormData((prev) => ({ ...prev, audioUrl: url }))}
+              accept="audio/*"
+              maxSize={200}
+              showPreview={true}
             />
           </div>
         </div>

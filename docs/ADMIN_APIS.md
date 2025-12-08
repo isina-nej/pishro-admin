@@ -401,6 +401,19 @@
 
 ---
 
+#### `POST /api/admin/books/upload`
+
+**کاربرد:** آپلود فایل کتاب (PDF/EPUB)، فایل صوتی و کاور کتاب؛ این endpoint URL هایی را بازمی‌گرداند که می‌توانند در `fileUrl`, `audioUrl`, `cover` در `POST /api/admin/books` استفاده شوند.
+
+**نوع درخواست:** `multipart/form-data`
+
+**Form Data:** `book` (File), `audio` (File), `cover` (File)
+
+**پاسخ:** `{ success: true, data: { uploads: [{ field: 'fileUrl'|'audioUrl'|'cover', url: '/uploads/...' }] } }`
+
+
+---
+
 ### Certificates (گواهینامه‌ها)
 
 #### `GET /api/admin/certificates`

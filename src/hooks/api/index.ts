@@ -35,6 +35,7 @@ export * from "./use-investment-models-page";
 
 // Add more exports as you create additional hook files
 export * from './use-books';
+export * from './use-books-upload';
 export * from './use-tags';
 export * from './use-faqs';
 export * from './use-images';
