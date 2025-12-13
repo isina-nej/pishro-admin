@@ -41,6 +41,10 @@ interface SessionResponse {
 
 // Get base URL for auth endpoints (without /api prefix)
 const getAuthBaseURL = (): string => {
+  // In browser use relative URLs so cookies are sent to the same origin.
+  if (typeof window !== 'undefined') {
+    return '';
+  }
   return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "https://pishrosarmaye.com";
 };
 
