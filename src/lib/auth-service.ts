@@ -39,14 +39,13 @@ interface SessionResponse {
   user: User;
 }
 
-// Get base URL for auth endpoints (without /api prefix)
-const getAuthBaseURL = (): string => {
-  return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "https://pishrosarmaye.com";
-};
+// Use the full NEXT_PUBLIC_API_URL (including /api) as the axios baseURL
+// This ensures client bundles always call the configured API host
+const AUTH_API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://pishrosarmaye.com/api";
 
 // Create a separate axios instance for auth endpoints
 const authClient = axios.create({
-  baseURL: getAuthBaseURL(),
+  baseURL: AUTH_API_BASE,
   timeout: 30000,
   withCredentials: true,
 });
@@ -54,7 +53,7 @@ const authClient = axios.create({
 // تابع login
 export async function login(phone: string, password: string): Promise<User> {
   try {
-    const response = await authClient.post<ApiResponse<LoginResponse>>("/api/auth/login", {
+    const response = await authClient.post<ApiResponse<LoginResponse>>("/auth/login", {
       phone,
       password,
     });
@@ -82,7 +81,7 @@ export async function login(phone: string, password: string): Promise<User> {
 export async function checkSession(): Promise<User | null> {
   try {
     const response =
-      await authClient.get<ApiResponse<SessionResponse>>("/api/auth/session");
+      await authClient.get<ApiResponse<SessionResponse>>("/auth/session");
 
     if (response.data?.status === "success" && response.data?.data?.user) {
       return response.data.data.user;
@@ -99,7 +98,7 @@ export async function checkSession(): Promise<User | null> {
 export async function logout(): Promise<boolean> {
   try {
     const response =
-      await authClient.post<ApiResponse<{ loggedOut: boolean }>>("/api/auth/logout");
+      await authClient.post<ApiResponse<{ loggedOut: boolean }>>("/auth/logout");
     return response.data?.status === "success";
   } catch (error) {
     console.error("خطا در خروج:", error);
