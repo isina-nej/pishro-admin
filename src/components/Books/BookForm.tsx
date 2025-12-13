@@ -101,11 +101,11 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     formDataUpload.append("type", type);
 
     try {
-      const uploadUrl =
-        process.env.NEXT_PUBLIC_API_URL || "https://pishrosarmaye.com";
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "https://pishrosarmaye.com";
 
       const response = await axios.post(
-        `${uploadUrl}/api/admin/books/upload`,
+        `${baseUrl}/api/admin/books/upload`,
         formDataUpload,
         {
           headers: {

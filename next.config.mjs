@@ -40,7 +40,11 @@ const nextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
-            value: 'unload=()',
+            value: 'unload=*',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
           },
         ],
       },

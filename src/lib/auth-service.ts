@@ -59,16 +59,20 @@ export async function login(phone: string, password: string): Promise<User> {
       password,
     });
 
-    if (response.data.status === "success") {
+    if (response.data?.status === "success" && response.data?.data) {
       // API returns structured data under response.data.data
       return response.data.data as unknown as User;
     }
 
-    throw new Error(response.data.message || "خطا در ورود");
+    const errorMessage = response.data?.message || "خطا در ورود";
+    throw new Error(errorMessage);
   } catch (error: any) {
     // مدیریت خطاهای axios
     if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
+    }
+    if (error.message) {
+      throw error;
     }
     throw new Error("خطا در برقراری ارتباط با سرور");
   }
@@ -78,9 +82,9 @@ export async function login(phone: string, password: string): Promise<User> {
 export async function checkSession(): Promise<User | null> {
   try {
     const response =
-      await authClient.get<ApiResponse<SessionResponse>>("/auth/session");
+      await authClient.get<ApiResponse<SessionResponse>>("/api/auth/session");
 
-    if (response.data.status === "success") {
+    if (response.data?.status === "success" && response.data?.data?.user) {
       return response.data.data.user;
     }
 
@@ -96,7 +100,7 @@ export async function logout(): Promise<boolean> {
   try {
     const response =
       await authClient.post<ApiResponse<{ loggedOut: boolean }>>("/api/auth/logout");
-    return response.data.status === "success";
+    return response.data?.status === "success";
   } catch (error) {
     console.error("خطا در خروج:", error);
     return false;
