@@ -28,5 +28,10 @@ export function middleware(request: NextRequest) {
 export const config = {
   // NOTE: temporarily allowing _next paths to be matched so we can log host headers
   // for static assets — revert by adding _next/static/_next/image to the excluded matcher
-  matcher: ['/((?!api|favicon.ico).*)'],
+  // Match all paths except those starting with:
+  // - api (API routes)
+  // - _next/static (static files)
+  // - _next/image (image optimization files)
+  // - favicon.ico (favicon file)
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };
