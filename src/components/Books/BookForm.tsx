@@ -8,6 +8,7 @@ import {
   useBook,
 } from "@/hooks/api/use-books";
 import { toast } from "sonner";
+import { uploadBookPdf } from "@/lib/services/book-pdf-service";
 import type { CreateBookRequest } from "@/types/api";
 
 interface BookFormProps {
@@ -20,6 +21,9 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
   const createBook = useCreateBook();
   const updateBook = useUpdateBook();
   const { data: bookData } = useBook(bookId || "");
+
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [pdfFileName, setPdfFileName] = useState<string>("");
 
   const [formData, setFormData] = useState<CreateBookRequest>({
     title: "",
@@ -69,6 +73,12 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         audioUrl: book.audioUrl || "",
         tagIds: book.tagIds || [],
       });
+      
+      // اگر فایل PDF وجود دارد، نام فایل را استخراج کنید
+      if (book.fileUrl) {
+        const fileName = book.fileUrl.split("/").pop() || "";
+        setPdfFileName(fileName);
+      }
     }
   }, [isEdit, bookData]);
 
@@ -127,6 +137,37 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
     }));
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPdf(true);
+    try {
+      const result = await uploadBookPdf(file);
+      setFormData((prev) => ({
+        ...prev,
+        fileUrl: result.fileUrl,
+      }));
+      setPdfFileName(result.fileName);
+      toast.success("فایل PDF با موفقیت آپلود شد");
+    } catch (error: any) {
+      toast.error(error?.message || "خطا در آپلود فایل PDF");
+      console.error(error);
+    } finally {
+      setUploadingPdf(false);
+      // Reset file input
+      e.target.value = "";
+    }
+  };
+
+  const handleRemovePdf = () => {
+    setFormData((prev) => ({
+      ...prev,
+      fileUrl: "",
+    }));
+    setPdfFileName("");
   };
 
   return (
@@ -324,32 +365,17 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
           </div>
         </div>
 
-        <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
-          <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک فایل
-            </label>
-            <input
-              type="text"
-              name="fileUrl"
-              value={formData.fileUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
-          </div>
-
-          <div className="w-full sm:w-1/2">
-            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              لینک صوتی
-            </label>
-            <input
-              type="text"
-              name="audioUrl"
-              value={formData.audioUrl || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
-          </div>
+        <div className="mb-5.5">
+          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+            لینک صوتی
+          </label>
+          <input
+            type="text"
+            name="audioUrl"
+            value={formData.audioUrl || ""}
+            onChange={handleChange}
+            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+          />
         </div>
 
         <div className="mb-5.5">
