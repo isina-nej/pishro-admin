@@ -145,11 +145,11 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         toast.error("دسته‌بندی الزامی است");
         return;
       }
-      if (!formData.cover.trim()) {
+      if (!formData.cover?.trim()) {
         toast.error("تصویر جلد الزامی است");
         return;
       }
-      if (!formData.fileUrl.trim()) {
+      if (!formData.fileUrl?.trim()) {
         toast.error("فایل PDF الزامی است");
         return;
       }
@@ -993,14 +993,14 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         onClose={() => setShowPdfPreview(false)}
         title="پیش‌نمایش PDF"
         type="pdf"
-        src={formData.fileUrl}
+        src={formData.fileUrl ? getPishro2ResourceUrl(formData.fileUrl) : null}
       />
       <PreviewModal
         isOpen={showAudioPreview}
         onClose={() => setShowAudioPreview(false)}
         title="پیش‌نمایش صوت"
         type="audio"
-        src={getPishro2ResourceUrl(formData.audioUrl)}
+        src={formData.audioUrl ? getPishro2ResourceUrl(formData.audioUrl) : null}
       />
     </div>
   );

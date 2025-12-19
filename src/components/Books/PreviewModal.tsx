@@ -7,7 +7,7 @@ interface PreviewModalProps {
   onClose: () => void;
   title: string;
   type: "image" | "pdf" | "audio";
-  src: string;
+  src: string | null | undefined;
 }
 
 const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -17,7 +17,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
   type,
   src,
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || !src) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
