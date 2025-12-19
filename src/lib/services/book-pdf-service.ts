@@ -36,8 +36,9 @@ export async function uploadBookPdf(file: File): Promise<UploadPdfResponse> {
   const formData = new FormData();
   formData.append("pdf", file);
 
-  // ارسال درخواست
-  const response = await fetch("/api/admin/books/upload-pdf", {
+  // ارسال درخواست به pishro2 server
+  const fileUploadUrl = process.env.NEXT_PUBLIC_FILE_UPLOAD_URL || "http://localhost:3001";
+  const response = await fetch(`${fileUploadUrl}/api/admin/books/upload-pdf`, {
     method: "POST",
     body: formData,
   });
@@ -51,7 +52,7 @@ export async function uploadBookPdf(file: File): Promise<UploadPdfResponse> {
 
   const data = await response.json();
   
-  if (!data.success) {
+  if (data.status !== "success") {
     throw new Error(data.message || "خطا در آپلود فایل PDF");
   }
 

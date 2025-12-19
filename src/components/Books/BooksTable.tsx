@@ -6,6 +6,7 @@ import { useBooks, useDeleteBook } from "@/hooks/api/use-books";
 import type { DigitalBookWithRelations } from "@/types/api";
 import Image from "next/image";
 import { toast } from "sonner";
+import { getPishro2ResourceUrl } from "@/lib/get-pishro2-url";
 
 const BooksTable: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -99,10 +100,11 @@ const BooksTable: React.FC = () => {
                           {book.cover && (
                             <div className="h-12 w-12 overflow-hidden rounded">
                               <Image
-                                src={book.cover}
+                                src={getPishro2ResourceUrl(book.cover)}
                                 alt={book.title}
                                 width={48}
                                 height={48}
+                                unoptimized
                                 className="h-full w-full object-cover"
                               />
                             </div>

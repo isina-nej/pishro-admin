@@ -1,6 +1,6 @@
 // @/hooks/api/use-books.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api-client';
+import { api as booksApiClient } from '@/lib/api-client';
 import type {
   BooksListResponse,
   BookResponse,
@@ -29,7 +29,7 @@ export function useBooks(params?: BooksQueryParams) {
   return useQuery<BooksListResponse>({
     queryKey: booksKeys.list(params),
     queryFn: async () => {
-      const response = await api.get<BooksListResponse>('/admin/books', { params });
+      const response = await booksApiClient.get<BooksListResponse>('/admin/books', { params });
       return response;
     },
   });
@@ -42,7 +42,7 @@ export function useBook(id: string) {
   return useQuery<BookResponse>({
     queryKey: booksKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get<BookResponse>(`/admin/books/${id}`);
+      const response = await booksApiClient.get<BookResponse>(`/admin/books/${id}`);
       return response;
     },
     enabled: !!id,
@@ -57,8 +57,8 @@ export function useCreateBook() {
 
   return useMutation({
     mutationFn: async (data: CreateBookRequest) => {
-      const response = await api.post<BookResponse>('/admin/books', data);
-      return response.data;
+      const response = await booksApiClient.post<BookResponse>('/admin/books', data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: booksKeys.lists() });
@@ -74,13 +74,13 @@ export function useUpdateBook() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateBookRequest }) => {
-      const response = await api.patch<BookResponse>(`/admin/books/${id}`, data);
-      return response.data as unknown as BookResponse;
+      const response = await booksApiClient.patch<BookResponse>(`/admin/books/${id}`, data);
+      return response as unknown as BookResponse;
     },
     onSuccess: (response: BookResponse) => {
       queryClient.invalidateQueries({ queryKey: booksKeys.lists() });
-      if (response.data && 'id' in response.data) {
-        queryClient.invalidateQueries({ queryKey: booksKeys.detail(response.data.id as string) });
+      if (response && 'id' in response) {
+        queryClient.invalidateQueries({ queryKey: booksKeys.detail(response.id as string) });
       }
     },
   });
@@ -94,7 +94,7 @@ export function useDeleteBook() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/books/${id}`);
+      await booksApiClient.delete(`/admin/books/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: booksKeys.lists() });

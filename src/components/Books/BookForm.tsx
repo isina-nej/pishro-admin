@@ -9,6 +9,10 @@ import {
 } from "@/hooks/api/use-books";
 import { toast } from "sonner";
 import { uploadBookPdf } from "@/lib/services/book-pdf-service";
+import { uploadBookCover } from "@/lib/services/book-cover-service";
+import { uploadBookAudio } from "@/lib/services/book-audio-service";
+import { getPishro2ResourceUrl } from "@/lib/get-pishro2-url";
+import PreviewModal from "./PreviewModal";
 import type { CreateBookRequest } from "@/types/api";
 
 interface BookFormProps {
@@ -22,8 +26,20 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
   const updateBook = useUpdateBook();
   const { data: bookData } = useBook(bookId || "");
 
+  // Preview states
+  const [showCoverPreview, setShowCoverPreview] = useState(false);
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
+  const [showAudioPreview, setShowAudioPreview] = useState(false);
+
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [pdfFileName, setPdfFileName] = useState<string>("");
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverFileName, setCoverFileName] = useState<string>("");
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [audioFileName, setAudioFileName] = useState<string>("");
+  const [coverPreview, setCoverPreview] = useState<string>("");
+  const [pdfPreview, setPdfPreview] = useState(false);
+  const [audioPreview, setAudioPreview] = useState(false);
 
   const [formData, setFormData] = useState<CreateBookRequest>({
     title: "",
@@ -74,10 +90,32 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         tagIds: book.tagIds || [],
       });
       
-      // اگر فایل PDF وجود دارد، نام فایل را استخراج کنید
+      // اگر فایل PDF وجود دارد، نام فایل و وضعیت را استخراج کنید
       if (book.fileUrl) {
         const fileName = book.fileUrl.split("/").pop() || "";
         setPdfFileName(fileName);
+        setPdfPreview(true); // نشان دادن که فایل موجود است
+      }
+
+      // اگر کاور وجود دارد، نام فایل و پیش‌نمایش را استخراج کنید
+      if (book.cover) {
+        const fileName = book.cover.split("/").pop() || "";
+        setCoverFileName(fileName);
+        // استفاده از URL درست از طریق util function
+        const coverUrl = getPishro2ResourceUrl(book.cover);
+        setCoverPreview(coverUrl);
+      }
+
+      // اگر فایل صوتی وجود دارد، نام فایل و وضعیت را استخراج کنید
+      if (book.audioUrl) {
+        const fileName = book.audioUrl.split("/").pop() || "";
+        setAudioFileName(fileName);
+        setAudioPreview(true); // نشان دادن که فایل موجود است
+      }
+
+      // اگر فایل PDF وجود دارد، نام فایل و وضعیت را استخراج کنید
+      if (book.fileUrl) {
+        setPdfPreview(true); // نشان دادن که فایل موجود است
       }
     }
   }, [isEdit, bookData]);
@@ -86,6 +124,38 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     e.preventDefault();
 
     try {
+      // Validation: Check if required fields are filled
+      if (!formData.title.trim()) {
+        toast.error("عنوان کتاب الزامی است");
+        return;
+      }
+      if (!formData.slug.trim()) {
+        toast.error("Slug الزامی است");
+        return;
+      }
+      if (!formData.author.trim()) {
+        toast.error("نویسنده الزامی است");
+        return;
+      }
+      if (!formData.description.trim()) {
+        toast.error("توضیحات الزامی است");
+        return;
+      }
+      if (!formData.category.trim()) {
+        toast.error("دسته‌بندی الزامی است");
+        return;
+      }
+      if (!formData.cover.trim()) {
+        toast.error("تصویر جلد الزامی است");
+        return;
+      }
+      if (!formData.fileUrl.trim()) {
+        toast.error("فایل PDF الزامی است");
+        return;
+      }
+
+      console.log("Submitting book data:", formData);
+      
       if (isEdit && bookId) {
         await updateBook.mutateAsync({ id: bookId, data: formData });
         toast.success("کتاب با موفقیت به‌روزرسانی شد");
@@ -95,8 +165,8 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       }
       router.push("/books");
     } catch (error: any) {
+      console.error("Submit error:", error);
       toast.error(error?.message || "خطا در ذخیره کتاب");
-      console.error(error);
     }
   };
 
@@ -143,18 +213,26 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Show PDF preview indicator
+    setPdfPreview(true);
+
     setUploadingPdf(true);
     try {
+      console.log("Starting PDF upload...", { fileName: file.name, fileSize: file.size });
       const result = await uploadBookPdf(file);
+      console.log("PDF upload result:", result);
+      
       setFormData((prev) => ({
         ...prev,
         fileUrl: result.fileUrl,
       }));
       setPdfFileName(result.fileName);
       toast.success("فایل PDF با موفقیت آپلود شد");
+      console.log("Updated formData with fileUrl:", result.fileUrl);
     } catch (error: any) {
+      console.error("PDF upload error:", error);
       toast.error(error?.message || "خطا در آپلود فایل PDF");
-      console.error(error);
+      setPdfPreview(false); // Clear preview on error
     } finally {
       setUploadingPdf(false);
       // Reset file input
@@ -168,6 +246,83 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       fileUrl: "",
     }));
     setPdfFileName("");
+    setPdfPreview(false);
+  };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setCoverPreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setUploadingCover(true);
+    try {
+      const result = await uploadBookCover(file);
+      setFormData((prev) => ({
+        ...prev,
+        cover: result.fileUrl,
+      }));
+      setCoverFileName(result.fileName);
+      toast.success("تصویر کاور با موفقیت آپلود شد");
+    } catch (error: any) {
+      toast.error(error?.message || "خطا در آپلود تصویر کاور");
+      console.error(error);
+      setCoverPreview(""); // Clear preview on error
+    } finally {
+      setUploadingCover(false);
+      // Reset file input
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveCover = () => {
+    setFormData((prev) => ({
+      ...prev,
+      cover: "",
+    }));
+    setCoverFileName("");
+    setCoverPreview("");
+  };
+
+  const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Show audio preview indicator
+    setAudioPreview(true);
+
+    setUploadingAudio(true);
+    try {
+      const result = await uploadBookAudio(file);
+      setFormData((prev) => ({
+        ...prev,
+        audioUrl: result.fileUrl,
+      }));
+      setAudioFileName(result.fileName);
+      toast.success("فایل صوتی با موفقیت آپلود شد");
+    } catch (error: any) {
+      toast.error(error?.message || "خطا در آپلود فایل صوتی");
+      console.error(error);
+      setAudioPreview(false); // Clear preview on error
+    } finally {
+      setUploadingAudio(false);
+      // Reset file input
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveAudio = () => {
+    setFormData((prev) => ({
+      ...prev,
+      audioUrl: "",
+    }));
+    setAudioFileName("");
+    setAudioPreview(false);
   };
 
   return (
@@ -340,15 +495,83 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <div className="w-full sm:w-1/2">
             <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-              تصویر جلد (URL)
+              تصویر جلد <span className="text-red">*</span>
             </label>
-            <input
-              type="text"
-              name="cover"
-              value={formData.cover || ""}
-              onChange={handleChange}
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            />
+            <div className="mb-3 rounded border border-dashed border-stroke p-4 dark:border-dark-3">
+              {coverPreview ? (
+                <div>
+                  <div 
+                    className="mb-3 flex cursor-pointer items-center justify-center rounded bg-gray-light p-2 transition hover:bg-gray-light/80 dark:bg-dark-3 dark:hover:bg-dark-3/80"
+                    onClick={() => setShowCoverPreview(true)}
+                  >
+                    <img
+                      src={coverPreview}
+                      alt="Cover Preview"
+                      className="max-h-40 max-w-32 rounded object-cover"
+                      onError={(e) => {
+                        console.error("Image load error:", coverPreview);
+                        e.currentTarget.src = "/images/placeholder.jpg";
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded bg-green-light p-3">
+                    <div>
+                      <p className="text-sm font-medium text-dark dark:text-white">
+                        {coverFileName}
+                      </p>
+                      <p className="text-xs text-body dark:text-body-dark">
+                        کاور کتاب (برای بزرگ‌نمایی کلیک کنید)
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCover}
+                      className="text-red hover:text-opacity-80"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverUpload}
+                    disabled={uploadingCover}
+                    className="hidden"
+                  />
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <svg
+                      className="mb-2 h-8 w-8 text-body dark:text-body-dark"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    <p className="text-sm font-medium text-dark dark:text-white">
+                      {uploadingCover ? "در حال آپلود..." : "برای انتخاب تصویر کلیک کنید"}
+                    </p>
+                    <p className="text-xs text-body dark:text-body-dark">
+                      PNG, JPG یا WebP (حداکثر 5MB)
+                    </p>
+                  </div>
+                </label>
+              )}
+            </div>
+            {formData.cover && !coverPreview && (
+              <div className="mt-2">
+                <p className="text-xs text-body dark:text-body-dark">
+                  لینک فعلی: {formData.cover}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="w-full sm:w-1/2">
@@ -367,15 +590,190 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
 
         <div className="mb-5.5">
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            لینک صوتی
+            فایل PDF <span className="text-red">*</span>
           </label>
-          <input
-            type="text"
-            name="audioUrl"
-            value={formData.audioUrl || ""}
-            onChange={handleChange}
-            className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-          />
+          <div className="mb-3 rounded border border-dashed border-stroke p-4 dark:border-dark-3">
+            {pdfFileName || pdfPreview ? (
+              <div>
+                {pdfPreview && (
+                  <div 
+                    className="mb-3 flex cursor-pointer items-center justify-center rounded bg-blue-light p-4 transition hover:bg-blue-light/80 dark:bg-blue-dark/20 dark:hover:bg-blue-dark/30"
+                    onClick={() => setShowPdfPreview(true)}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <svg
+                        className="h-8 w-8 text-blue"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <p className="text-sm font-medium text-dark dark:text-white">
+                        فایل PDF آپلود شد (برای پیش‌نمایش کلیک کنید)
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center justify-between rounded bg-green-light p-3">
+                  <div>
+                    <p className="text-sm font-medium text-dark dark:text-white">
+                      {pdfFileName}
+                    </p>
+                    <p className="text-xs text-body dark:text-body-dark">
+                      فایل PDF کتاب
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemovePdf}
+                    className="text-red hover:text-opacity-80"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={handlePdfUpload}
+                  disabled={uploadingPdf}
+                  className="hidden"
+                />
+                <div className="flex flex-col items-center justify-center py-6">
+                  <svg
+                    className="mb-2 h-8 w-8 text-body dark:text-body-dark"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium text-dark dark:text-white">
+                    {uploadingPdf ? "در حال آپلود..." : "برای انتخاب فایل PDF کلیک کنید"}
+                  </p>
+                  <p className="text-xs text-body dark:text-body-dark">
+                    فقط فایل PDF (حداکثر 100MB)
+                  </p>
+                </div>
+              </label>
+            )}
+          </div>
+          {formData.fileUrl && !pdfFileName && (
+            <div className="mt-2">
+              <p className="text-xs text-body dark:text-body-dark">
+                لینک فعلی: {formData.fileUrl}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="mb-5.5">
+          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+            فایل صوتی
+          </label>
+          <div className="mb-3 rounded border border-dashed border-stroke p-4 dark:border-dark-3">
+            {audioFileName || audioPreview ? (
+              <div>
+                {audioPreview && (
+                  <div className="mb-3 flex items-center justify-center rounded bg-purple-light p-4 dark:bg-purple-dark/20">
+                    <div className="flex flex-col items-center gap-2">
+                      <svg
+                        className="h-8 w-8 text-purple"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                      <p className="text-sm font-medium text-dark dark:text-white">
+                        فایل صوتی آپلود شد
+                      </p>
+                      {audioPreview && formData.audioUrl && (
+                        <audio
+                          controls
+                          className="mt-2 w-full"
+                          src={getPishro2ResourceUrl(formData.audioUrl)}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center justify-between rounded bg-green-light p-3">
+                  <div>
+                    <p className="text-sm font-medium text-dark dark:text-white">
+                      {audioFileName}
+                    </p>
+                    <p className="text-xs text-body dark:text-body-dark">
+                      فایل صوتی کتاب
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveAudio}
+                    className="text-red hover:text-opacity-80"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleAudioUpload}
+                  disabled={uploadingAudio}
+                  className="hidden"
+                />
+                <div className="flex flex-col items-center justify-center py-6">
+                  <svg
+                    className="mb-2 h-8 w-8 text-body dark:text-body-dark"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium text-dark dark:text-white">
+                    {uploadingAudio ? "در حال آپلود..." : "برای انتخاب فایل صوتی کلیک کنید"}
+                  </p>
+                  <p className="text-xs text-body dark:text-body-dark">
+                    MP3, WAV، OGG یا دیگر فرمت‌های صوتی (حداکثر 500MB)
+                  </p>
+                </div>
+              </label>
+            )}
+          </div>
+          {formData.audioUrl && !audioFileName && (
+            <div className="mt-2">
+              <p className="text-xs text-body dark:text-body-dark">
+                لینک فعلی: {formData.audioUrl}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mb-5.5">
@@ -581,6 +979,29 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
           </button>
         </div>
       </form>
+
+      {/* Preview Modals */}
+      <PreviewModal
+        isOpen={showCoverPreview}
+        onClose={() => setShowCoverPreview(false)}
+        title="پیش‌نمایش کاور"
+        type="image"
+        src={coverPreview}
+      />
+      <PreviewModal
+        isOpen={showPdfPreview}
+        onClose={() => setShowPdfPreview(false)}
+        title="پیش‌نمایش PDF"
+        type="pdf"
+        src={formData.fileUrl}
+      />
+      <PreviewModal
+        isOpen={showAudioPreview}
+        onClose={() => setShowAudioPreview(false)}
+        title="پیش‌نمایش صوت"
+        type="audio"
+        src={getPishro2ResourceUrl(formData.audioUrl)}
+      />
     </div>
   );
 };

@@ -13,8 +13,9 @@ import type { ApiResponse } from "./api-response";
 
 // Base URL configuration - connects directly to backend API
 // CORS has been fixed on the backend, so we can make direct requests
+// تنبیه: باید به پروژه pishro2 اشاره کند، نه به آدرس دیگری!
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.pishrosarmaye.com/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 // Create Axios instance
 const apiClient: AxiosInstance = axios.create({
