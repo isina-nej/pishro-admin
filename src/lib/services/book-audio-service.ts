@@ -13,9 +13,12 @@ export interface UploadAudioResponse {
 
 /**
  * آپلود فایل صوتی کتاب
+ * @param file فایل صوتی
+ * @param onProgress تابع callback برای نشان دادن پیشرفت (0-100)
  */
 export async function uploadBookAudio(
-  file: File
+  file: File,
+  onProgress?: (progress: number) => void
 ): Promise<UploadAudioResponse> {
   // اعتبارسنجی نوع فایل
   const allowedTypes = [
@@ -60,26 +63,53 @@ export async function uploadBookAudio(
   const formData = new FormData();
   formData.append("audio", file);
 
-  // ارسال درخواست به pishro2 server
+  // ارسال درخواست به pishro2 server با XMLHttpRequest برای نشان دادن پیشرفت
   const fileUploadUrl = process.env.NEXT_PUBLIC_FILE_UPLOAD_URL || "http://localhost:3001";
-  const response = await fetch(`${fileUploadUrl}/api/admin/books/upload-audio`, {
-    method: "POST",
-    body: formData,
+  
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    
+    // پیگیری پیشرفت آپلود
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        onProgress?.(progress);
+      }
+    });
+    
+    xhr.addEventListener("load", () => {
+      if (xhr.status === 200) {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          if (response.status === "success") {
+            resolve(response.data);
+          } else {
+            reject(new Error(response.message || "خطا در آپلود فایل صوتی"));
+          }
+        } catch (error) {
+          reject(new Error("خطا در تجزیه پاسخ سرور"));
+        }
+      } else {
+        try {
+          const errorData = JSON.parse(xhr.responseText);
+          reject(new Error(errorData.message || "خطا در آپلود فایل صوتی"));
+        } catch (error) {
+          reject(new Error("خطا در آپلود فایل صوتی"));
+        }
+      }
+    });
+    
+    xhr.addEventListener("error", () => {
+      reject(new Error("خطا در اتصال به سرور"));
+    });
+    
+    xhr.addEventListener("abort", () => {
+      reject(new Error("آپلود لغو شد"));
+    });
+    
+    xhr.open("POST", `${fileUploadUrl}/api/admin/books/upload-audio`);
+    xhr.send(formData);
   });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "خطا در آپلود فایل صوتی");
-  }
-
-  const data = await response.json();
-
-  // بررسی وجود data در response
-  if (!data || !data.data) {
-    throw new Error(data?.message || "خطا در آپلود فایل صوتی");
-  }
-
-  return data.data;
 }
 
 /**

@@ -32,10 +32,13 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
   const [showAudioPreview, setShowAudioPreview] = useState(false);
 
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState(0);
   const [pdfFileName, setPdfFileName] = useState<string>("");
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverProgress, setCoverProgress] = useState(0);
   const [coverFileName, setCoverFileName] = useState<string>("");
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
   const [audioFileName, setAudioFileName] = useState<string>("");
   const [coverPreview, setCoverPreview] = useState<string>("");
   const [pdfPreview, setPdfPreview] = useState(false);
@@ -217,9 +220,12 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     setPdfPreview(true);
 
     setUploadingPdf(true);
+    setPdfProgress(0);
     try {
       console.log("Starting PDF upload...", { fileName: file.name, fileSize: file.size });
-      const result = await uploadBookPdf(file);
+      const result = await uploadBookPdf(file, (progress) => {
+        setPdfProgress(progress);
+      });
       console.log("PDF upload result:", result);
       
       setFormData((prev) => ({
@@ -235,6 +241,7 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       setPdfPreview(false); // Clear preview on error
     } finally {
       setUploadingPdf(false);
+      setPdfProgress(0);
       // Reset file input
       e.target.value = "";
     }
@@ -261,8 +268,11 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     reader.readAsDataURL(file);
 
     setUploadingCover(true);
+    setCoverProgress(0);
     try {
-      const result = await uploadBookCover(file);
+      const result = await uploadBookCover(file, (progress) => {
+        setCoverProgress(progress);
+      });
       setFormData((prev) => ({
         ...prev,
         cover: result.fileUrl,
@@ -275,6 +285,7 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       setCoverPreview(""); // Clear preview on error
     } finally {
       setUploadingCover(false);
+      setCoverProgress(0);
       // Reset file input
       e.target.value = "";
     }
@@ -297,8 +308,11 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
     setAudioPreview(true);
 
     setUploadingAudio(true);
+    setAudioProgress(0);
     try {
-      const result = await uploadBookAudio(file);
+      const result = await uploadBookAudio(file, (progress) => {
+        setAudioProgress(progress);
+      });
       setFormData((prev) => ({
         ...prev,
         audioUrl: result.fileUrl,
@@ -311,6 +325,7 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
       setAudioPreview(false); // Clear preview on error
     } finally {
       setUploadingAudio(false);
+      setAudioProgress(0);
       // Reset file input
       e.target.value = "";
     }
@@ -514,6 +529,24 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
                       }}
                     />
                   </div>
+                  {uploadingCover && (
+                    <div className="mb-3 rounded bg-gray-light p-3 dark:bg-dark-3">
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-xs font-medium text-dark dark:text-white">
+                          درحال آپلود...
+                        </p>
+                        <p className="text-xs font-bold text-primary">
+                          {coverProgress}%
+                        </p>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-gray">
+                        <div
+                          className="h-full bg-primary transition-all duration-300"
+                          style={{ width: `${coverProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between rounded bg-green-light p-3">
                     <div>
                       <p className="text-sm font-medium text-dark dark:text-white">
@@ -620,6 +653,24 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
                     </div>
                   </div>
                 )}
+                {uploadingPdf && (
+                  <div className="mb-3 rounded bg-gray-light p-3 dark:bg-dark-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-dark dark:text-white">
+                        درحال آپلود...
+                      </p>
+                      <p className="text-xs font-bold text-primary">
+                        {pdfProgress}%
+                      </p>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${pdfProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center justify-between rounded bg-green-light p-3">
                   <div>
                     <p className="text-sm font-medium text-dark dark:text-white">
@@ -713,6 +764,24 @@ const BookForm: React.FC<BookFormProps> = ({ bookId, isEdit = false }) => {
                           src={getPishro2ResourceUrl(formData.audioUrl)}
                         />
                       )}
+                    </div>
+                  </div>
+                )}
+                {uploadingAudio && (
+                  <div className="mb-3 rounded bg-gray-light p-3 dark:bg-dark-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-medium text-dark dark:text-white">
+                        درحال آپلود...
+                      </p>
+                      <p className="text-xs font-bold text-primary">
+                        {audioProgress}%
+                      </p>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${audioProgress}%` }}
+                      />
                     </div>
                   </div>
                 )}
