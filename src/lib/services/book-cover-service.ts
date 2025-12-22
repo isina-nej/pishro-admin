@@ -42,75 +42,65 @@ export async function uploadBookCover(
   const formData = new FormData();
   formData.append("cover", file);
 
-  // ارسال درخواست به pishro2 server با fetch برای بهتری CORS و reliability
+  // ارسال درخواست به pishro2 server با XMLHttpRequest برای نشان دادن پیشرفت
   const fileUploadUrl = process.env.NEXT_PUBLIC_FILE_UPLOAD_URL || "http://localhost:3001";
   const uploadEndpoint = `${fileUploadUrl}/api/admin/books/upload-cover`;
   
   return new Promise((resolve, reject) => {
-    const controller = new AbortController();
+    const xhr = new XMLHttpRequest();
     const uploadTimeout = setTimeout(() => {
-      controller.abort();
+      xhr.abort();
       reject(new Error("مهلت زمانی آپلود به پایان رسید. لطفاً دوباره تلاش کنید"));
-    }, 60000); // 60 second timeout
-
-    // استفاده از fetch API برای آپلود بهتر
-    fetch(uploadEndpoint, {
-      method: "POST",
-      body: formData,
-      credentials: "include", // شامل کردن cookies برای احراز هویت
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        clearTimeout(uploadTimeout);
-        
-        const contentType = response.headers.get("content-type");
-        let data;
-        
+    }, 60000); // 60 second timeout for images
+    
+    // پیگیری پیشرفت آپلود
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        onProgress?.(progress);
+      }
+    });
+    
+    xhr.addEventListener("load", () => {
+      clearTimeout(uploadTimeout);
+      if (xhr.status === 200 || xhr.status === 201) {
         try {
-          if (contentType?.includes("application/json")) {
-            data = await response.json();
+          const response = JSON.parse(xhr.responseText);
+          if (response.data) {
+            resolve(response.data);
           } else {
-            data = await response.text();
+            reject(new Error(response.message || "خطا در آپلود فایل کاور"));
           }
         } catch (error) {
           reject(new Error("خطا در تجزیه پاسخ سرور"));
-          return;
         }
-
-        if (response.ok) {
-          if (typeof data === "object" && data.data) {
-            // اگر پاسخ ساختار مورد انتظار را داشته باشد
-            resolve(data.data);
-          } else if (typeof data === "object" && data.fileUrl) {
-            // اگر داده مستقیماً فایل URL باشد
-            resolve(data);
-          } else {
-            reject(new Error("پاسخ سرور معتبر نیست"));
-          }
-        } else {
-          const errorMessage = 
-            (typeof data === "object" && data.message) || 
-            `خطا در آپلود فایل کاور (کد خطا: ${response.status})`;
-          reject(new Error(errorMessage));
+      } else {
+        try {
+          const errorData = JSON.parse(xhr.responseText);
+          reject(new Error(errorData.message || "خطا در آپلود فایل کاور"));
+        } catch (error) {
+          reject(new Error(`خطا در آپلود فایل کاور (کد خطا: ${xhr.status})`));
         }
-      })
-      .catch((error) => {
-        clearTimeout(uploadTimeout);
-        
-        if (error.name === "AbortError") {
-          reject(new Error("آپلود لغو شد"));
-        } else if (error instanceof TypeError) {
-          console.error("Upload fetch error - URL:", uploadEndpoint, "Error:", error);
-          reject(new Error("خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید"));
-        } else {
-          reject(error);
-        }
-      });
-
-    // برای نمایش پیشرفت، ما نمی‌توانیم با fetch استاندارد استفاده کنیم
-    // اگر نیاز به پیشرفت باشد، بایستی از ReadableStream استفاده کنیم
-    if (onProgress) {
-      onProgress(50); // نمایش پیشرفت تخمینی
+      }
+    });
+    
+    xhr.addEventListener("error", () => {
+      clearTimeout(uploadTimeout);
+      console.error("Upload XHR Error - URL:", uploadEndpoint);
+      reject(new Error("خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید"));
+    });
+    
+    xhr.addEventListener("abort", () => {
+      clearTimeout(uploadTimeout);
+      reject(new Error("آپلود لغو شد"));
+    });
+    
+    try {
+      xhr.open("POST", uploadEndpoint);
+      xhr.send(formData);
+    } catch (error) {
+      clearTimeout(uploadTimeout);
+      reject(new Error("نتوانست درخواست را ارسال کند. آدرس سرور غلط است"));
     }
   });
 }
