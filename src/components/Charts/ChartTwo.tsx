@@ -90,14 +90,6 @@ const ChartTwo: React.FC = () => {
       fontFamily: "Satoshi",
       fontWeight: 500,
       fontSize: "14px",
-
-      markers: {
-        radius: 99,
-        width: 16,
-        height: 16,
-        strokeWidth: 10,
-        strokeColor: "transparent",
-      },
     },
     fill: {
       opacity: 1,
