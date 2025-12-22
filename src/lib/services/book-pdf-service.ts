@@ -104,7 +104,6 @@ export async function uploadBookPdf(
       console.log(`📁 Starting PDF upload (${(file.size / (1024 * 1024)).toFixed(2)}MB) to ${uploadEndpoint}`);
       xhr.send(formData);
     } catch (error) {
-      clearTimeout(uploadTimeout);
       console.error("❌ Error sending request:", error);
       reject(new Error("نتوانست درخواست را ارسال کند. آدرس سرور غلط است"));
     }
