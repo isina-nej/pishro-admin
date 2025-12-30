@@ -150,10 +150,10 @@ export async function uploadBookPdf(
     throw new Error("فقط فایل‌های PDF مجاز است");
   }
 
-  // اعتبارسنجی حجم فایل (100MB)
-  const MAX_SIZE = 100 * 1024 * 1024;
+  // اعتبارسنجی حجم فایل (1GB)
+  const MAX_SIZE = 1024 * 1024 * 1024;
   if (file.size > MAX_SIZE) {
-    throw new Error("حجم فایل بیش از حد است. حداکثر 100MB مجاز است.");
+    throw new Error("حجم فایل بیش از حد است. حداکثر 1GB مجاز است.");
   }
 
   // اعتبارسنجی پسوند

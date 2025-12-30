@@ -9,7 +9,7 @@ import {
 } from "@/lib/api-response";
 
 // تنظیمات برای آپلود PDF
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1GB
 const ALLOWED_TYPES = ["application/pdf"];
 
 export async function POST(req: NextRequest) {

@@ -89,9 +89,9 @@ interface UploadAudioResponse {
 
 | موضوع | pishro-admin2 | pishro2 | وضعیت |
 |-------|--------------|---------|--------|
-| **PDF Size** | 100MB ✅ | 100MB ✅ | ✅ طابق |
-| **Cover Size** | 5MB ✅ | 5MB ✅ | ✅ طابق |
-| **Audio Size** | 500MB ✅ | 500MB ✅ | ✅ طابق |
+| **PDF Size** | 1GB ✅ | 1GB ✅ | ✅ طابق |
+| **Cover Size** | 50MB ✅ | 50MB ✅ | ✅ طابق |
+| **Audio Size** | 1GB ✅ | 1GB ✅ | ✅ طابق |
 | **PDF Types** | `application/pdf` | `application/pdf` | ✅ طابق |
 | **Cover Types** | JPG, PNG, WebP | JPG, PNG, WebP | ✅ طابق |
 | **Audio Types** | MP3, WAV, OGG, WebM, AAC, M4A | MP3, WAV, OGG, WebM, AAC, M4A | ✅ طابق |

@@ -36,10 +36,10 @@ export async function uploadBookAudio(
     );
   }
 
-  // اعتبارسنجی حجم فایل (500MB)
-  const MAX_SIZE = 500 * 1024 * 1024;
+  // اعتبارسنجی حجم فایل (1GB)
+  const MAX_SIZE = 1024 * 1024 * 1024;
   if (file.size > MAX_SIZE) {
-    throw new Error("حجم فایل بیش از حد است. حداکثر 500MB مجاز است.");
+    throw new Error("حجم فایل بیش از حد است. حداکثر 1GB مجاز است.");
   }
 
   // اعتبارسنجی پسوند

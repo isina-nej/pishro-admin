@@ -9,7 +9,7 @@ import {
 } from "@/lib/api-response";
 
 // تنظیمات برای آپلود صوت کتاب
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1GB
 const ALLOWED_TYPES = [
   "audio/mpeg",
   "audio/mp3",
